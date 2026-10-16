@@ -47,7 +47,15 @@ The database only, to run the back-end and front-end from the IDE:
 docker compose up -d
 ```
 
-When run from the IDE, the back-end must receive the `.env` credentials as environment variables: `SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/mdd`, `SPRING_DATASOURCE_USERNAME` and `SPRING_DATASOURCE_PASSWORD`.
+When run from the IDE, the back-end needs these environment variables (credentials from `.env`):
+
+| Variable | Value |
+| --- | --- |
+| `SPRING_PROFILES_ACTIVE` | `dev` |
+| `SPRING_DATASOURCE_USERNAME` | value of `MYSQL_USER` |
+| `SPRING_DATASOURCE_PASSWORD` | value of `MYSQL_PASSWORD` |
+
+The database URL defaults to `jdbc:mysql://localhost:3306/mdd`.
 
 ### 3. Access the application
 
@@ -67,6 +75,34 @@ The front-end is served by nginx, which forwards `/api/` calls to the back-end.
 | Follow back-end logs | `docker compose logs -f back` |
 | Stop the services | `docker compose --profile app down` |
 | Stop and **delete the database data** | `docker compose --profile app down -v` |
+
+## Database
+
+The schema is created and versioned by Flyway when the back-end starts. Hibernate only validates that the entities match it (`ddl-auto=validate`).
+
+| Location | Content | Loaded |
+| --- | --- | --- |
+| `back/src/main/resources/db/migration` | Schema (`V1`) and reference topics (`V2`) | Every environment |
+
+A migration that has already run is never edited: every schema change goes through a new `V<n>__<description>.sql` file.
+
+If your local database was created before Flyway was introduced, reset it once with `docker compose --profile app down -v`.
+
+## Spring profiles
+
+| Profile | Usage |
+| --- | --- |
+| `dev` | Local development: SQL logged. Enabled by Docker Compose. |
+| `prod` | Production: reduced logging. |
+
+## Tests
+
+The back-end tests run against a real MySQL database started by [Testcontainers](https://testcontainers.com/). They require Java 21 and a running Docker.
+
+```bash
+cd back
+./mvnw test
+```
 
 ## Documentation
 
