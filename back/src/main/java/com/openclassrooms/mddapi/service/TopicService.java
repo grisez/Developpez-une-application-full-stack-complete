@@ -2,23 +2,18 @@ package com.openclassrooms.mddapi.service;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
+import com.openclassrooms.mddapi.dto.TopicResponse;
 
-import com.openclassrooms.mddapi.model.Topic;
-import com.openclassrooms.mddapi.repository.TopicRepository;
+/**
+ * Business operations on topics.
+ */
+public interface TopicService {
 
-@Service
-public class TopicService implements ITopicService {
+	/**
+	 * Returns every topic, whether the user is subscribed to it or not.
+	 *
+	 * @return all topics
+	 */
+	List<TopicResponse> getTopics();
 
-	private TopicRepository topicRepository;
-	
-	public TopicService(TopicRepository topicRepository) {
-		this.topicRepository = topicRepository;
-	}
-
-	@Override
-	public List<Topic> getTopics() {
-		return topicRepository.findAll();
-	}
-	
 }
