@@ -6,23 +6,29 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.openclassrooms.mddapi.model.Topic;
-import com.openclassrooms.mddapi.service.ITopicService;
+import com.openclassrooms.mddapi.dto.TopicResponse;
+import com.openclassrooms.mddapi.service.TopicService;
 
+import lombok.RequiredArgsConstructor;
+
+/**
+ * REST endpoints for topics.
+ */
 @RestController
-@RequestMapping("/topic")
+@RequestMapping("/api/topics")
+@RequiredArgsConstructor
 public class TopicController {
-	
-	private ITopicService topicService;
-	
-	public TopicController(ITopicService topicService) {
-		this.topicService = topicService;		
-	}
 
+	private final TopicService topicService;
+
+	/**
+	 * Lists every topic.
+	 *
+	 * @return all topics
+	 */
 	@GetMapping
-	public List<Topic> getTopics() {
+	public List<TopicResponse> getTopics() {
 		return topicService.getTopics();
 	}
-	
-	
+
 }

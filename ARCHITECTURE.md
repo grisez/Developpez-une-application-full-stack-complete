@@ -51,11 +51,11 @@ src/main/java/com/openclassrooms/mddapi/
 ├── controller/    REST controllers: HTTP layer, input validation, DTOs in and out
 ├── dto/           request and response objects exchanged with the front-end
 ├── exception/     business exceptions and the global error handler
-├── mapper/        entity ↔ DTO conversion
+├── mapper/        entity ↔ DTO conversion (MapStruct)
 ├── model/         JPA entities
 ├── repository/    Spring Data JPA repositories
 ├── security/      Spring Security configuration and JWT handling
-└── service/       business rules (interfaces and implementations)
+└── service/       business rules: interfaces, implementations in service/impl/
 
 src/main/resources/
 ├── application.properties
