@@ -4,7 +4,7 @@ A social network for developers: subscribe to topics, read a news feed, write po
 
 | Part | Technologies | Folder |
 | --- | --- | --- |
-| Front-end | Angular 20, TypeScript | `front/` |
+| Front-end | Angular 20, TypeScript, Tailwind CSS 4, Angular CDK | `front/` |
 | Back-end | Spring Boot 3.5, Java 21, Spring Data JPA | `back/` |
 | Database | MySQL 8.4 | Docker container |
 
@@ -57,6 +57,16 @@ When run from the IDE, the back-end needs these environment variables (credentia
 
 The database URL defaults to `jdbc:mysql://localhost:3306/mdd`.
 
+The front-end, run from the IDE, requires Node.js 22:
+
+```bash
+cd front
+npm install
+npm start
+```
+
+The Angular dev server forwards `/api` calls to the back-end on port 9000 (`front/proxy.conf.json`), so the front-end and the API share the same origin, as they do with nginx in Docker.
+
 ### 3. Access the application
 
 | Service | URL |
@@ -102,6 +112,13 @@ The back-end tests run against a real MySQL database started by [Testcontainers]
 ```bash
 cd back
 ./mvnw test
+```
+
+The front-end tests run with Karma and Jasmine in a headless Chrome:
+
+```bash
+cd front
+npm run test:ci
 ```
 
 ## Documentation

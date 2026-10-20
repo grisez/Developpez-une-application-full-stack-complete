@@ -22,7 +22,7 @@ flowchart LR
     REPO -->|"JDBC"| DB
 ```
 
-- The Angular application runs in the browser. nginx serves it and forwards every `/api` call to the back-end.
+- The Angular application runs in the browser. nginx serves it and forwards every `/api` call to the back-end. In development, the Angular dev server plays the same role through `proxy.conf.json`.
 - The back-end exposes a JSON REST API secured by JWT.
 - MySQL stores the data. Flyway creates and evolves the schema.
 
@@ -30,7 +30,7 @@ flowchart LR
 
 | Area | Tools |
 | --- | --- |
-| Front-end | Angular 20, TypeScript 5.9, Angular CLI, RxJS, Signals, Tailwind CSS, Angular CDK (accessibility) |
+| Front-end | Angular 20 (standalone components, esbuild builder), TypeScript 5.9, Angular CLI, RxJS, Signals, Tailwind CSS 4, Angular CDK (accessibility) |
 | Back-end | Java 21, Spring Boot 3.5 (Web, Data JPA, Security, Validation), Lombok, Maven |
 | Database | MySQL 8.4, Flyway |
 | Security | JWT (Spring Security OAuth2 Resource Server), Argon2id password hashing |
@@ -74,6 +74,8 @@ src/app/
 ├── features/    one folder per feature: auth, feed, topics, posts, profile
 └── shared/      reusable UI components
 ```
+
+Files follow the Angular 20 naming convention: a component lives in `name.ts` with its template in `name.html` (class `Name`). Services keep the `.service.ts` suffix so they never clash with the model of the same name. Routes are lazy loaded.
 
 ## Architecture rules
 
