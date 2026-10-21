@@ -77,6 +77,18 @@ src/app/
 
 Files follow the Angular 20 naming convention: a component lives in `name.ts` with its template in `name.html` (class `Name`). Services keep the `.service.ts` suffix so they never clash with the model of the same name. Routes are lazy loaded.
 
+## Session
+
+| Aspect | Choice |
+| --- | --- |
+| Token | JWT signed in HS256, holding the user id, valid for **7 days** (`mdd.security.jwt.expiration`) |
+| Storage | `mdd_token` cookie: `HttpOnly`, `SameSite=Strict`, `Secure` in production, limited to `/api`, with the same 7-day lifetime |
+| Persistence | The cookie outlives the browser session. At startup, the front-end calls `GET /api/auth/me` before the first navigation to restore the logged-in user |
+| Route protection | `authGuard` sends visitors to `/login`; `guestGuard` sends logged-in users from the home, login and registration pages to `/feed` |
+| Expiration | The browser deletes the cookie when it expires. Any 401 answer then clears the user and opens `/login` (`errorInterceptor`) |
+
+The token is kept in an HttpOnly cookie rather than in `localStorage`: JavaScript can read `localStorage`, so a single XSS flaw would let an attacker steal the token. The browser sends the cookie on its own, which is why every state-changing request is protected against CSRF.
+
 ## Architecture rules
 
 - Controllers only return DTOs, never JPA entities.

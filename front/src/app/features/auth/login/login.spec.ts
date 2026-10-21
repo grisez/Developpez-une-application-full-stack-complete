@@ -47,7 +47,7 @@ describe('Login', () => {
     expect(element.querySelector('#password-error')).not.toBeNull();
   });
 
-  it('should log in and go back to the home page', () => {
+  it('should log in and open the feed', () => {
     // Arrange
     authService.login.and.returnValue(of({ id: 1, username: 'alice', email: 'alice@mdd.dev' }));
     const navigate = spyOn(TestBed.inject(Router), 'navigateByUrl');
@@ -60,7 +60,7 @@ describe('Login', () => {
 
     // Assert
     expect(authService.login).toHaveBeenCalledWith({ identifier: 'alice', password: 'Str0ng!Password' });
-    expect(navigate).toHaveBeenCalledWith('/');
+    expect(navigate).toHaveBeenCalledWith('/feed');
   });
 
   it('should show a generic message when the credentials are rejected', () => {

@@ -50,7 +50,7 @@ describe('Register', () => {
     expect(element.querySelector('#email-error')).not.toBeNull();
   });
 
-  it('should register with valid data and go back to the home page', () => {
+  it('should register with valid data and open the feed', () => {
     // Arrange
     authService.register.and.returnValue(of({ id: 1, username: 'alice', email: 'alice@mdd.dev' }));
     const navigate = spyOn(TestBed.inject(Router), 'navigateByUrl');
@@ -68,7 +68,7 @@ describe('Register', () => {
       email: 'alice@mdd.dev',
       password: 'Str0ng!Password',
     });
-    expect(navigate).toHaveBeenCalledWith('/');
+    expect(navigate).toHaveBeenCalledWith('/feed');
   });
 
   it('should explain that the email is already used when the API answers 409', () => {
