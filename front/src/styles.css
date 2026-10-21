@@ -1,1 +1,8 @@
 @import 'tailwindcss';
+
+/* Colors of the Figma mockups. White text on the primary color has a 4.8:1 contrast ratio (WCAG AA). */
+@theme {
+  --color-primary: #7763c5;
+  --color-primary-dark: #5f4ea6;
+  --color-brand: #7451eb;
+}
