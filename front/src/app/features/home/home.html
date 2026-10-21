@@ -1,3 +1,13 @@
-<main class="flex min-h-screen flex-col items-center justify-center gap-8 p-4">
-  <h1 class="text-4xl font-bold">MDD</h1>
+<main class="flex min-h-screen flex-col items-center justify-center gap-12 p-4">
+  <h1>
+    <img src="images/logo.png" alt="MDD, le réseau social des développeurs" class="w-48 md:w-80" />
+  </h1>
+  <nav aria-label="Accès au compte" class="flex flex-col gap-4 md:flex-row md:gap-12">
+    <a routerLink="/login" class="w-40 rounded-md border border-black py-2 text-center text-sm hover:bg-gray-100">
+      Se connecter
+    </a>
+    <a routerLink="/register" class="w-40 rounded-md border border-black py-2 text-center text-sm hover:bg-gray-100">
+      S'inscrire
+    </a>
+  </nav>
 </main>
