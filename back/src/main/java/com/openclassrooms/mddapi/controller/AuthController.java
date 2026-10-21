@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.openclassrooms.mddapi.dto.LoginRequest;
 import com.openclassrooms.mddapi.dto.RegisterRequest;
 import com.openclassrooms.mddapi.dto.UserResponse;
 import com.openclassrooms.mddapi.security.AuthCookieManager;
@@ -45,6 +46,20 @@ public class AuthController {
 	public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
 		AuthResult result = authService.register(request);
 		return ResponseEntity.status(HttpStatus.CREATED)
+				.header(HttpHeaders.SET_COOKIE, authCookieManager.createAuthCookie(result.token()).toString())
+				.body(result.user());
+	}
+
+	/**
+	 * Logs a user in with their email or their username, and sets the authentication cookie.
+	 *
+	 * @param request the credentials
+	 * @return 200 with the logged-in user
+	 */
+	@PostMapping("/login")
+	public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest request) {
+		AuthResult result = authService.login(request);
+		return ResponseEntity.ok()
 				.header(HttpHeaders.SET_COOKIE, authCookieManager.createAuthCookie(result.token()).toString())
 				.body(result.user());
 	}

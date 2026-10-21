@@ -13,6 +13,7 @@
       <input
         id="username"
         type="text"
+        appTrim
         formControlName="username"
         autocomplete="username"
         class="rounded-md border border-primary px-3 py-2 focus:outline-2 focus:outline-primary"
@@ -20,7 +21,9 @@
         aria-describedby="username-error"
       />
       @if (showError('username')) {
-        <p id="username-error" class="text-sm text-red-700">Le nom d'utilisateur doit contenir de 3 à 30 caractères.</p>
+        <p id="username-error" class="text-sm text-red-700">
+          De 3 à 30 caractères : lettres, chiffres, points, tirets et tirets bas uniquement.
+        </p>
       }
     </div>
 
@@ -29,6 +32,7 @@
       <input
         id="email"
         type="email"
+        appTrim
         formControlName="email"
         autocomplete="email"
         class="rounded-md border border-primary px-3 py-2 focus:outline-2 focus:outline-primary"

@@ -66,6 +66,32 @@ class AuthIntegrationTest {
 				.andExpect(status().isConflict());
 	}
 
+	@Test
+	void registeredUserCanLogInWithTheirUsernameOrTheirEmail() throws Exception {
+		// Arrange
+		mockMvc.perform(register("grace@mdd.dev", "grace")).andExpect(status().isCreated());
+
+		// Act and assert
+		for (String identifier : new String[] { "grace", "Grace@MDD.dev" }) {
+			Cookie authCookie = mockMvc.perform(login(identifier, "Str0ng!Password"))
+					.andExpect(status().isOk())
+					.andExpect(jsonPath("$.username").value("grace"))
+					.andReturn().getResponse().getCookie(AuthCookieManager.COOKIE_NAME);
+			assertThat(authCookie).isNotNull();
+		}
+		mockMvc.perform(login("grace", "Wr0ng!Password"))
+				.andExpect(status().isUnauthorized());
+	}
+
+	private static MockHttpServletRequestBuilder login(String identifier, String password) {
+		return post("/api/auth/login")
+				.cookie(new Cookie("XSRF-TOKEN", CSRF_TOKEN))
+				.header("X-XSRF-TOKEN", CSRF_TOKEN)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+						{"identifier": "%s", "password": "%s"}""".formatted(identifier, password));
+	}
+
 	private static MockHttpServletRequestBuilder register(String email, String username) {
 		return post("/api/auth/register")
 				.cookie(new Cookie("XSRF-TOKEN", CSRF_TOKEN))

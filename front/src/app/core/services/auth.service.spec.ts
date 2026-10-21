@@ -32,6 +32,18 @@ describe('AuthService', () => {
     expect(service.isLoggedIn()).toBeTrue();
   });
 
+  it('should store the user once logged in', () => {
+    // Act
+    service.login({ identifier: 'alice', password: 'Str0ng!Password' }).subscribe();
+    const request = http.expectOne('/api/auth/login');
+    request.flush(alice);
+
+    // Assert
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ identifier: 'alice', password: 'Str0ng!Password' });
+    expect(service.currentUser()).toEqual(alice);
+  });
+
   it('should restore the logged-in user at startup', () => {
     // Act
     service.loadCurrentUser().subscribe();

@@ -53,6 +53,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	/**
+	 * Handles a failed login with a generic message that does not tell which of the two fields is wrong.
+	 *
+	 * @param exception the failed login
+	 * @return a 401 problem detail
+	 */
+	@ExceptionHandler(InvalidCredentialsException.class)
+	public ProblemDetail handleInvalidCredentials(InvalidCredentialsException exception) {
+		return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, exception.getMessage());
+	}
+
+	/**
 	 * Handles an email that another account already uses.
 	 *
 	 * @param exception the duplicate error

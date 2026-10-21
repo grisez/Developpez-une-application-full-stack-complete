@@ -7,6 +7,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,9 +18,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.openclassrooms.mddapi.dto.LoginRequest;
 import com.openclassrooms.mddapi.dto.RegisterRequest;
 import com.openclassrooms.mddapi.dto.UserResponse;
 import com.openclassrooms.mddapi.exception.EmailAlreadyUsedException;
+import com.openclassrooms.mddapi.exception.InvalidCredentialsException;
 import com.openclassrooms.mddapi.exception.UsernameAlreadyUsedException;
 import com.openclassrooms.mddapi.mapper.UserMapper;
 import com.openclassrooms.mddapi.model.User;
@@ -91,6 +95,70 @@ class AuthServiceImplTest {
 		assertThatThrownBy(() -> authService.register(new RegisterRequest("alice@mdd.dev", "alice", "Str0ng!Password")))
 				.isInstanceOf(UsernameAlreadyUsedException.class);
 		verify(userRepository, never()).save(any());
+	}
+
+	@Test
+	void loginWithAnEmailLooksTheUserUpByNormalizedEmail() {
+		// Arrange
+		User alice = user();
+		when(userRepository.findByEmail("alice@mdd.dev")).thenReturn(Optional.of(alice));
+		when(passwordEncoder.matches("Str0ng!Password", "$argon2id$hash")).thenReturn(true);
+		when(jwtService.generateToken(alice)).thenReturn("signed-token");
+
+		// Act
+		AuthResult result = authService.login(new LoginRequest(" Alice@MDD.dev ", "Str0ng!Password"));
+
+		// Assert
+		assertThat(result.user()).isEqualTo(new UserResponse(1L, "alice", "alice@mdd.dev"));
+		assertThat(result.token()).isEqualTo("signed-token");
+		verify(userRepository, never()).findByUsername(any());
+	}
+
+	@Test
+	void loginWithAUsernameLooksTheUserUpByUsername() {
+		// Arrange
+		User alice = user();
+		when(userRepository.findByUsername("alice")).thenReturn(Optional.of(alice));
+		when(passwordEncoder.matches("Str0ng!Password", "$argon2id$hash")).thenReturn(true);
+		when(jwtService.generateToken(alice)).thenReturn("signed-token");
+
+		// Act
+		AuthResult result = authService.login(new LoginRequest("alice", "Str0ng!Password"));
+
+		// Assert
+		assertThat(result.user().username()).isEqualTo("alice");
+		verify(userRepository, never()).findByEmail(any());
+	}
+
+	@Test
+	void loginRejectsAWrongPassword() {
+		// Arrange
+		when(userRepository.findByUsername("alice")).thenReturn(Optional.of(user()));
+		when(passwordEncoder.matches("wrong", "$argon2id$hash")).thenReturn(false);
+
+		// Act and assert
+		assertThatThrownBy(() -> authService.login(new LoginRequest("alice", "wrong")))
+				.isInstanceOf(InvalidCredentialsException.class);
+		verify(jwtService, never()).generateToken(any());
+	}
+
+	@Test
+	void loginRejectsAnUnknownAccountWithTheSameError() {
+		// Arrange
+		when(userRepository.findByUsername("nobody")).thenReturn(Optional.empty());
+
+		// Act and assert
+		assertThatThrownBy(() -> authService.login(new LoginRequest("nobody", "Str0ng!Password")))
+				.isInstanceOf(InvalidCredentialsException.class);
+	}
+
+	private static User user() {
+		User user = new User();
+		user.setId(1L);
+		user.setEmail("alice@mdd.dev");
+		user.setUsername("alice");
+		user.setPassword("$argon2id$hash");
+		return user;
 	}
 
 }

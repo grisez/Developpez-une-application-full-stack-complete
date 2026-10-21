@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { ProblemDetail } from '../../../core/models/problem-detail';
 import { AuthService } from '../../../core/services/auth.service';
 import { Header } from '../../../shared/components/header/header';
+import { TrimDirective } from '../../../shared/directives/trim.directive';
 import { passwordValidator } from '../../../shared/validators/password.validator';
 
 /** Messages shown when the API rejects a field already taken by another account. */
@@ -19,7 +20,7 @@ const CONFLICT_MESSAGES: Record<string, string> = {
  */
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, RouterLink, Header],
+  imports: [ReactiveFormsModule, RouterLink, Header, TrimDirective],
   templateUrl: './register.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -28,7 +29,10 @@ export class Register {
   private readonly router = inject(Router);
 
   protected readonly form = inject(NonNullableFormBuilder).group({
-    username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
+    username: [
+      '',
+      [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern(/^[A-Za-z0-9._-]+$/)],
+    ],
     email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
     password: ['', [Validators.required, passwordValidator]],
   });
