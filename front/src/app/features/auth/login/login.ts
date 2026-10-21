@@ -37,7 +37,7 @@ export class Login {
     this.submitting.set(true);
     this.serverError.set(null);
     this.authService.login(this.form.getRawValue()).subscribe({
-      next: () => this.router.navigateByUrl('/'),
+      next: () => this.router.navigateByUrl('/feed'),
       error: (error: HttpErrorResponse) => {
         this.submitting.set(false);
         this.serverError.set(

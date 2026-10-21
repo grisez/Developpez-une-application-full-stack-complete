@@ -49,7 +49,7 @@ export class Register {
     this.submitting.set(true);
     this.serverError.set(null);
     this.authService.register(this.form.getRawValue()).subscribe({
-      next: () => this.router.navigateByUrl('/'),
+      next: () => this.router.navigateByUrl('/feed'),
       error: (error: HttpErrorResponse) => {
         this.submitting.set(false);
         this.serverError.set(this.messageFor(error));
