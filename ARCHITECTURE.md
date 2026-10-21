@@ -82,7 +82,20 @@ Files follow the Angular 20 naming convention: a component lives in `name.ts` wi
 - Controllers only return DTOs, never JPA entities.
 - Business rules live in services, never in controllers.
 - Every route requires a JWT, except `/api/auth/register` and `/api/auth/login`.
+- The JWT travels in an HttpOnly cookie that JavaScript cannot read. Every state-changing request must carry the CSRF token: Angular copies the `XSRF-TOKEN` cookie into the `X-XSRF-TOKEN` header.
+- Passwords are hashed with Argon2id, never stored or logged in plain text.
 - The schema only changes through a new Flyway migration. A migration that has already run is never edited.
 - Demo data is only loaded with the `dev` profile.
 - Secrets come from environment variables, never from the code.
 - Errors are handled in one place and never expose internal details.
+
+## Design patterns
+
+| Pattern | Where | Purpose |
+| --- | --- | --- |
+| Layered architecture | controller → service → repository | Each layer has a single responsibility |
+| Dependency injection | Spring, constructor injection (`@RequiredArgsConstructor`) | Classes receive their dependencies, which makes them easy to test with mocks |
+| Repository | `repository/` (Spring Data JPA) | Isolates data access |
+| DTO | `dto/` | The API never exposes JPA entities |
+| Mapper | `mapper/` (MapStruct) | Entity to DTO conversion generated at compile time |
+| Strategy | `CookieBearerTokenResolver`, `PasswordEncoder`, `ProblemDetailSecurityHandler` | Implementations plugged into Spring Security without changing the framework: read the token from a cookie, hash with Argon2id, answer 401 and 403 errors as problem details |

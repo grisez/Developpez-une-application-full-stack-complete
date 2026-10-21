@@ -30,6 +30,7 @@ cp .env.example .env
 | `MYSQL_USER` / `MYSQL_PASSWORD` | Account used by the back-end |
 | `MYSQL_ROOT_PASSWORD` | MySQL administrator password |
 | `MYSQL_PORT` | Port exposed on the host (3306 by default) |
+| `JWT_SECRET` | Key that signs the authentication tokens, at least 32 characters (`openssl rand -base64 48`) |
 
 The `.env` file is ignored by Git and must never be committed.
 
@@ -54,6 +55,9 @@ When run from the IDE, the back-end needs these environment variables (credentia
 | `SPRING_PROFILES_ACTIVE` | `dev` |
 | `SPRING_DATASOURCE_USERNAME` | value of `MYSQL_USER` |
 | `SPRING_DATASOURCE_PASSWORD` | value of `MYSQL_PASSWORD` |
+| `JWT_SECRET` | value of `JWT_SECRET` |
+
+The back-end refuses to start if `JWT_SECRET` is missing or shorter than 32 characters.
 
 The database URL defaults to `jdbc:mysql://localhost:3306/mdd`.
 
