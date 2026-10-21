@@ -43,4 +43,9 @@ export class AuthService {
   login(request: LoginRequest): Observable<User> {
     return this.http.post<User>('/api/auth/login', request).pipe(tap((user) => this.user.set(user)));
   }
+
+  /** Forgets the user locally, for instance when the API reports that the session has expired. */
+  clearSession(): void {
+    this.user.set(null);
+  }
 }
