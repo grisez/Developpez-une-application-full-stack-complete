@@ -1,0 +1,71 @@
+<app-header class="hidden md:block" />
+
+<main class="mx-auto flex max-w-sm flex-col px-6 py-6 md:max-w-4xl md:px-10">
+  <a routerLink="/" aria-label="Retour à l'accueil" class="w-fit text-3xl leading-none">&larr;</a>
+
+  <img src="images/logo.png" alt="" class="mx-auto mt-4 w-40 md:hidden" />
+
+  <h1 class="mt-4 text-center text-xl font-semibold md:mt-0">Inscription</h1>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="mx-auto mt-6 flex w-full max-w-xs flex-col gap-4">
+    <div class="flex flex-col gap-1">
+      <label for="username" class="text-sm">Nom d'utilisateur</label>
+      <input
+        id="username"
+        type="text"
+        formControlName="username"
+        autocomplete="username"
+        class="rounded-md border border-primary px-3 py-2 focus:outline-2 focus:outline-primary"
+        [attr.aria-invalid]="showError('username')"
+        aria-describedby="username-error"
+      />
+      @if (showError('username')) {
+        <p id="username-error" class="text-sm text-red-700">Le nom d'utilisateur doit contenir de 3 à 30 caractères.</p>
+      }
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="email" class="text-sm">Adresse e-mail</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        class="rounded-md border border-primary px-3 py-2 focus:outline-2 focus:outline-primary"
+        [attr.aria-invalid]="showError('email')"
+        aria-describedby="email-error"
+      />
+      @if (showError('email')) {
+        <p id="email-error" class="text-sm text-red-700">Veuillez saisir une adresse e-mail valide.</p>
+      }
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="password" class="text-sm">Mot de passe</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        autocomplete="new-password"
+        class="rounded-md border border-primary px-3 py-2 focus:outline-2 focus:outline-primary"
+        [attr.aria-invalid]="showError('password')"
+        aria-describedby="password-hint"
+      />
+      <p id="password-hint" class="text-xs" [class.text-red-700]="showError('password')">
+        8 caractères minimum, avec au moins un chiffre, une minuscule, une majuscule et un caractère spécial.
+      </p>
+    </div>
+
+    @if (serverError(); as message) {
+      <p role="alert" class="text-center text-sm text-red-700">{{ message }}</p>
+    }
+
+    <button
+      type="submit"
+      [disabled]="submitting()"
+      class="mx-auto mt-2 w-32 rounded-md bg-primary py-2 text-sm text-white hover:bg-primary-dark disabled:opacity-60"
+    >
+      S'inscrire
+    </button>
+  </form>
+</main>
