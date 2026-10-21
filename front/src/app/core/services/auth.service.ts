@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, catchError, map, of, tap } from 'rxjs';
 
-import { RegisterRequest, User } from '../models/user';
+import { LoginRequest, RegisterRequest, User } from '../models/user';
 
 /**
  * Holds the logged-in user and talks to the authentication endpoints.
@@ -37,5 +37,10 @@ export class AuthService {
   /** Creates an account; the API logs the new user in by setting the authentication cookie. */
   register(request: RegisterRequest): Observable<User> {
     return this.http.post<User>('/api/auth/register', request).pipe(tap((user) => this.user.set(user)));
+  }
+
+  /** Logs in with an email or a username; the API sets the authentication cookie. */
+  login(request: LoginRequest): Observable<User> {
+    return this.http.post<User>('/api/auth/login', request).pipe(tap((user) => this.user.set(user)));
   }
 }
