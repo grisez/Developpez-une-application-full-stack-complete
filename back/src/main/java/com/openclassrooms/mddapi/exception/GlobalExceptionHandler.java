@@ -17,6 +17,17 @@ import lombok.extern.slf4j.Slf4j;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	/**
+	 * Handles a request about a user that does not exist.
+	 *
+	 * @param exception the missing user error
+	 * @return a 404 problem detail
+	 */
+	@ExceptionHandler(UserNotFoundException.class)
+	public ProblemDetail handleUserNotFound(UserNotFoundException exception) {
+		return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "User not found.");
+	}
+
+	/**
 	 * Handles any unexpected error: the cause is logged on the server, the client only gets a generic message.
 	 *
 	 * @param exception the unexpected error
