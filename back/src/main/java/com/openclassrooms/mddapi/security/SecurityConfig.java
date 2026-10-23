@@ -1,6 +1,7 @@
 package com.openclassrooms.mddapi.security;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -38,8 +39,11 @@ import com.nimbusds.jose.jwk.source.ImmutableSecret;
 @EnableConfigurationProperties(JwtProperties.class)
 public class SecurityConfig {
 
-	/** The only routes reachable without being logged in. */
-	private static final String[] PUBLIC_ENDPOINTS = { "/api/auth/register", "/api/auth/login" };
+	/**
+	 * The only routes reachable without being logged in. Logout is one of them so that a user whose token has
+	 * already expired can still get rid of the cookie.
+	 */
+	private static final String[] PUBLIC_ENDPOINTS = { "/api/auth/register", "/api/auth/login", "/api/auth/logout" };
 
 	/**
 	 * Defines the security rules applied to every HTTP request.
@@ -68,7 +72,7 @@ public class SecurityConfig {
 						.requestMatchers("/error").permitAll()
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(oauth2 -> oauth2
-						.bearerTokenResolver(new CookieBearerTokenResolver())
+						.bearerTokenResolver(new CookieBearerTokenResolver(Set.of(PUBLIC_ENDPOINTS)))
 						.jwt(Customizer.withDefaults())
 						.authenticationEntryPoint(problemDetailHandler)
 						.accessDeniedHandler(problemDetailHandler))
