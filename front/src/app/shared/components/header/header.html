@@ -37,4 +37,20 @@
 <!-- Written once, displayed inline on desktop and in the side menu on mobile -->
 <ng-template #navigationLinks>
   <button type="button" (click)="logout()" class="text-sm text-red-700 hover:underline">Se déconnecter</button>
+  <a
+    routerLink="/feed"
+    routerLinkActive="text-primary font-semibold"
+    ariaCurrentWhenActive="page"
+    (click)="closeMenu()"
+    class="text-sm hover:underline"
+    >Articles</a
+  >
+  <a
+    routerLink="/topics"
+    routerLinkActive="text-primary font-semibold"
+    ariaCurrentWhenActive="page"
+    (click)="closeMenu()"
+    class="text-sm hover:underline"
+    >Thèmes</a
+  >
 </ng-template>

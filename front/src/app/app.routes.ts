@@ -28,6 +28,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/feed/feed').then((m) => m.Feed),
   },
   {
+    path: 'topics',
+    title: 'Thèmes - MDD',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/topics/topics').then((m) => m.Topics),
+  },
+  {
     path: '**',
     loadComponent: () => import('./features/not-found/not-found').then((m) => m.NotFound),
   },
