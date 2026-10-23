@@ -1,6 +1,7 @@
 package com.openclassrooms.mddapi.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -82,6 +83,33 @@ class TopicIntegrationTest {
 		// Act and assert: a malicious site can make the browser send the cookie, but not the header
 		mockMvc.perform(post("/api/topics/3/subscribe").cookie(authCookie))
 				.andExpect(status().isForbidden());
+	}
+
+	@Test
+	void unsubscribingRemovesTheSubscriptionAndCanBeRepeatedSafely() throws Exception {
+		// Arrange
+		Cookie authCookie = mockMvc.perform(post("/api/auth/register")
+						.cookie(CSRF_COOKIE)
+						.header("X-XSRF-TOKEN", CSRF_COOKIE.getValue())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{"email": "mona@mdd.dev", "username": "mona", "password": "Str0ng!Password"}"""))
+				.andReturn().getResponse().getCookie(AuthCookieManager.COOKIE_NAME);
+		mockMvc.perform(post("/api/topics/4/subscribe")
+				.cookie(CSRF_COOKIE, authCookie)
+				.header("X-XSRF-TOKEN", CSRF_COOKIE.getValue()));
+
+		// Act
+		for (int attempt = 0; attempt < 2; attempt++) {
+			mockMvc.perform(delete("/api/topics/4/subscribe")
+							.cookie(CSRF_COOKIE, authCookie)
+							.header("X-XSRF-TOKEN", CSRF_COOKIE.getValue()))
+					.andExpect(status().isNoContent());
+		}
+
+		// Assert
+		mockMvc.perform(get("/api/topics").cookie(authCookie))
+				.andExpect(jsonPath("$[?(@.id == 4)].subscribed").value(false));
 	}
 
 }
