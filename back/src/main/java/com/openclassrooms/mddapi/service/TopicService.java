@@ -17,4 +17,13 @@ public interface TopicService {
 	 */
 	List<TopicResponse> getTopics(Long userId);
 
+	/**
+	 * Subscribes a user to a topic. Subscribing again to the same topic changes nothing.
+	 *
+	 * @param userId  the logged-in user
+	 * @param topicId the topic to follow
+	 * @throws com.openclassrooms.mddapi.exception.TopicNotFoundException if the topic does not exist
+	 */
+	void subscribe(Long userId, Integer topicId);
+
 }

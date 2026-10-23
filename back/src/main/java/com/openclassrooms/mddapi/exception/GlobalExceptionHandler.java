@@ -53,6 +53,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	/**
+	 * Handles a request about a topic that does not exist.
+	 *
+	 * @param exception the missing topic error
+	 * @return a 404 problem detail
+	 */
+	@ExceptionHandler(TopicNotFoundException.class)
+	public ProblemDetail handleTopicNotFound(TopicNotFoundException exception) {
+		return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "Topic not found.");
+	}
+
+	/**
 	 * Handles a failed login with a generic message that does not tell which of the two fields is wrong.
 	 *
 	 * @param exception the failed login
