@@ -1,10 +1,14 @@
 package com.openclassrooms.mddapi.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,10 +20,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
+import com.openclassrooms.mddapi.dto.CreatePostRequest;
 import com.openclassrooms.mddapi.dto.PostResponse;
+import com.openclassrooms.mddapi.exception.TopicNotFoundException;
 import com.openclassrooms.mddapi.security.SecurityConfig;
 import com.openclassrooms.mddapi.service.PostService;
 
@@ -56,6 +65,50 @@ class PostControllerTest {
 
 		// Assert
 		verify(postService).getFeed(7L, Sort.Direction.ASC);
+	}
+
+	@Test
+	void createReturnsTheCreatedPostWithItsLocation() throws Exception {
+		// Arrange
+		when(postService.create(eq(7L), any(CreatePostRequest.class))).thenReturn(
+				new PostResponse(5L, "Hello", "First post", Instant.parse("2026-10-23T10:00:00Z"), "alice", 2, "Java"));
+
+		// Act and assert
+		mockMvc.perform(create("""
+						{"topicId": 2, "title": "Hello", "content": "First post"}"""))
+				.andExpect(status().isCreated())
+				.andExpect(header().string(HttpHeaders.LOCATION, "/api/articles/5"))
+				.andExpect(jsonPath("$.id").value(5));
+	}
+
+	@Test
+	void createRequiresATopicATitleAndAContent() throws Exception {
+		// Act and assert
+		mockMvc.perform(create("""
+						{"title": "  ", "content": ""}"""))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.errors.topicId").exists())
+				.andExpect(jsonPath("$.errors.title").exists())
+				.andExpect(jsonPath("$.errors.content").exists());
+		verifyNoInteractions(postService);
+	}
+
+	@Test
+	void createOnAnUnknownTopicReturnsNotFound() throws Exception {
+		// Arrange
+		when(postService.create(eq(7L), any(CreatePostRequest.class))).thenThrow(new TopicNotFoundException(99));
+
+		// Act and assert
+		mockMvc.perform(create("""
+						{"topicId": 99, "title": "Hello", "content": "First post"}"""))
+				.andExpect(status().isNotFound());
+	}
+
+	private static MockHttpServletRequestBuilder create(String json) {
+		return post("/api/articles")
+				.with(jwt().jwt(token -> token.subject("7")))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(json);
 	}
 
 	@Test

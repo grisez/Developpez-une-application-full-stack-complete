@@ -65,6 +65,7 @@ describe('Feed', () => {
 
     // Act
     element.querySelector<HTMLButtonElement>('main button')!.click();
+    expect(element.querySelector('main a[href="/articles/new"]')).not.toBeNull();
     fixture.detectChanges();
 
     // Assert

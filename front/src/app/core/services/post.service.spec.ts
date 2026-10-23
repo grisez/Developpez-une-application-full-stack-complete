@@ -19,4 +19,21 @@ describe('PostService', () => {
     expect(request.request.params.get('sort')).toBe('asc');
     http.verify();
   });
+
+  it('should send a new article with POST', () => {
+    // Arrange
+    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+    const http = TestBed.inject(HttpTestingController);
+    const article = { topicId: 2, title: 'Hello', content: 'First post' };
+
+    // Act
+    TestBed.inject(PostService).create(article).subscribe();
+    const request = http.expectOne('/api/articles');
+    request.flush({});
+
+    // Assert
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual(article);
+    http.verify();
+  });
 });
