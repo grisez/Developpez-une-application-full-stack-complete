@@ -7,3 +7,10 @@ export interface Profile {
   email: string;
   subscriptions: Topic[];
 }
+
+/** Changes sent from the profile page; an empty password keeps the current one. */
+export interface UpdateProfileRequest {
+  email: string;
+  username: string;
+  password: string;
+}

@@ -11,7 +11,6 @@ import java.lang.annotation.Target;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.ReportAsSingleViolation;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -19,12 +18,12 @@ import jakarta.validation.constraints.Size;
  * Password rule of the functional specifications: at least 8 characters with at least one digit,
  * one lowercase letter, one uppercase letter and one special character.
  * The 64-character maximum follows the OWASP recommendation and bounds the cost of hashing.
+ * A null value is accepted, so that the rule also fits an optional password; add {@code @NotNull} when required.
  */
 @Documented
 @Constraint(validatedBy = {})
 @Target({ FIELD, PARAMETER })
 @Retention(RUNTIME)
-@NotNull
 @Size(min = 8, max = 64)
 @Pattern(regexp = ValidPassword.PATTERN)
 @ReportAsSingleViolation

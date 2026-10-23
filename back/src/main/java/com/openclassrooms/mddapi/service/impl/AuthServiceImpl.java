@@ -1,6 +1,5 @@
 package com.openclassrooms.mddapi.service.impl;
 
-import java.util.Locale;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +17,7 @@ import com.openclassrooms.mddapi.repository.UserRepository;
 import com.openclassrooms.mddapi.security.JwtService;
 import com.openclassrooms.mddapi.service.AuthResult;
 import com.openclassrooms.mddapi.service.AuthService;
+import com.openclassrooms.mddapi.util.EmailAddresses;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,7 +39,7 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	@Transactional
 	public AuthResult register(RegisterRequest request) {
-		String email = normalizeEmail(request.email());
+		String email = EmailAddresses.normalize(request.email());
 		String username = request.username();
 		if (userRepository.existsByEmail(email)) {
 			throw new EmailAlreadyUsedException();
@@ -71,21 +71,13 @@ public class AuthServiceImpl implements AuthService {
 	 */
 	private Optional<User> findByIdentifier(String identifier) {
 		if (identifier.contains("@")) {
-			return userRepository.findByEmail(normalizeEmail(identifier));
+			return userRepository.findByEmail(EmailAddresses.normalize(identifier));
 		}
 		return userRepository.findByUsername(identifier);
 	}
 
 	private AuthResult authenticated(User user) {
 		return new AuthResult(userMapper.toResponse(user), jwtService.generateToken(user));
-	}
-
-	/**
-	 * Emails are case-insensitive in practice, so they are stored and searched in a single form.
-	 * Surrounding spaces are already removed by the request records.
-	 */
-	private static String normalizeEmail(String email) {
-		return email.toLowerCase(Locale.ROOT);
 	}
 
 }

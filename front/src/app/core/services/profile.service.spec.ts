@@ -23,4 +23,21 @@ describe('ProfileService', () => {
     expect(received).toEqual(profile);
     http.verify();
   });
+
+  it('should send the profile changes with PUT', () => {
+    // Arrange
+    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+    const http = TestBed.inject(HttpTestingController);
+    const changes = { username: 'alicia', email: 'alicia@mdd.dev', password: '' };
+
+    // Act
+    TestBed.inject(ProfileService).updateProfile(changes).subscribe();
+    const request = http.expectOne('/api/me');
+    request.flush({ id: 1, username: 'alicia', email: 'alicia@mdd.dev', subscriptions: [] });
+
+    // Assert
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual(changes);
+    http.verify();
+  });
 });

@@ -21,4 +21,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	Optional<User> findByUsername(String username);
 
+	/** Whether another account than {@code id} already uses this email. */
+	boolean existsByEmailAndIdNot(String email, Long id);
+
+	/** Whether another account than {@code id} already uses this username. */
+	boolean existsByUsernameAndIdNot(String username, Long id);
+
 }

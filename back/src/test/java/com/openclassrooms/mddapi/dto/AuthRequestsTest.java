@@ -28,6 +28,17 @@ class AuthRequestsTest {
 	}
 
 	@Test
+	void updateProfileRequestTreatsAnEmptyPasswordAsUnchanged() {
+		// Act
+		UpdateProfileRequest request = new UpdateProfileRequest(" bob@mdd.dev ", " bob ", "");
+
+		// Assert
+		assertThat(request.email()).isEqualTo("bob@mdd.dev");
+		assertThat(request.username()).isEqualTo("bob");
+		assertThat(request.password()).isNull();
+	}
+
+	@Test
 	void missingValuesStayNullSoThatValidationReportsThem() {
 		// Act
 		LoginRequest request = new LoginRequest(null, null);
