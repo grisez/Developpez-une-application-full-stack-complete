@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,6 +48,19 @@ public class TopicController {
 	@PostMapping("/{id}/subscribe")
 	public ResponseEntity<Void> subscribe(@AuthenticationPrincipal Jwt jwt, @PathVariable Integer id) {
 		topicService.subscribe(Long.valueOf(jwt.getSubject()), id);
+		return ResponseEntity.noContent().build();
+	}
+
+	/**
+	 * Unsubscribes the logged-in user from a topic. Calling it for a topic the user does not follow changes nothing.
+	 *
+	 * @param jwt the validated token of the current request
+	 * @param id  the topic to stop following
+	 * @return 204 once unsubscribed
+	 */
+	@DeleteMapping("/{id}/subscribe")
+	public ResponseEntity<Void> unsubscribe(@AuthenticationPrincipal Jwt jwt, @PathVariable Integer id) {
+		topicService.unsubscribe(Long.valueOf(jwt.getSubject()), id);
 		return ResponseEntity.noContent().build();
 	}
 

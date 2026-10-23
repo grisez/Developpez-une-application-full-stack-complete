@@ -26,4 +26,13 @@ public interface TopicService {
 	 */
 	void subscribe(Long userId, Integer topicId);
 
+	/**
+	 * Unsubscribes a user from a topic. Unsubscribing from a topic the user does not follow changes nothing.
+	 *
+	 * @param userId  the logged-in user
+	 * @param topicId the topic to stop following
+	 * @throws com.openclassrooms.mddapi.exception.TopicNotFoundException if the topic does not exist
+	 */
+	void unsubscribe(Long userId, Integer topicId);
+
 }
