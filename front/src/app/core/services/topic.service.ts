@@ -15,4 +15,9 @@ export class TopicService {
   getTopics(): Observable<Topic[]> {
     return this.http.get<Topic[]>('/api/topics');
   }
+
+  /** Subscribes the logged-in user to a topic; subscribing twice has no effect. */
+  subscribe(topicId: number): Observable<void> {
+    return this.http.post<void>(`/api/topics/${topicId}/subscribe`, null);
+  }
 }
