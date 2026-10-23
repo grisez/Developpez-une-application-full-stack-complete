@@ -111,11 +111,25 @@ class SecurityConfigTest {
 		// Arrange: what Angular sends, the XSRF-TOKEN cookie value copied into the X-XSRF-TOKEN header
 		String csrfToken = "a-csrf-token-value";
 
-		// Act and assert: no controller is mapped yet, so passing security means reaching a 404
+		// Act and assert: the auth controller is not loaded in this test, so passing security means reaching a 404
 		mockMvc.perform(post("/api/auth/login")
 						.cookie(new Cookie("XSRF-TOKEN", csrfToken))
 						.header("X-XSRF-TOKEN", csrfToken))
 				.andExpect(status().isNotFound());
+	}
+
+	@Test
+	void publicEndpointsIgnoreAnInvalidTokenCookieSoThatUsersAreNeverStuck() throws Exception {
+		// Arrange: for example a token signed with a key that has since been replaced
+		String csrfToken = "a-csrf-token-value";
+
+		// Act and assert
+		for (String path : new String[] { "/api/auth/login", "/api/auth/logout" }) {
+			mockMvc.perform(post(path)
+							.cookie(new Cookie("XSRF-TOKEN", csrfToken), authCookie("not.a.valid-token"))
+							.header("X-XSRF-TOKEN", csrfToken))
+					.andExpect(status().isNotFound());
+		}
 	}
 
 	@Test

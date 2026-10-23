@@ -1,4 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
@@ -10,7 +11,7 @@ describe('Login', () => {
   let authService: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
-    authService = jasmine.createSpyObj<AuthService>('AuthService', ['login']);
+    authService = jasmine.createSpyObj<AuthService>('AuthService', ['login'], { isLoggedIn: signal(false) });
     await TestBed.configureTestingModule({
       imports: [Login],
       providers: [provideRouter([]), { provide: AuthService, useValue: authService }],
