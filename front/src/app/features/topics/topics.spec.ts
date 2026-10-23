@@ -1,7 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { Subject, of } from 'rxjs';
+import { Subject, of, throwError } from 'rxjs';
 
 import { Topic } from '../../core/models/topic';
 import { AuthService } from '../../core/services/auth.service';
@@ -16,7 +16,7 @@ describe('Topics', () => {
   let topicService: jasmine.SpyObj<TopicService>;
 
   beforeEach(async () => {
-    topicService = jasmine.createSpyObj<TopicService>('TopicService', ['getTopics']);
+    topicService = jasmine.createSpyObj<TopicService>('TopicService', ['getTopics', 'subscribe']);
     await TestBed.configureTestingModule({
       imports: [Topics],
       providers: [
@@ -66,5 +66,42 @@ describe('Topics', () => {
 
     // Act and assert
     expect(render().querySelector('[role="status"]')?.textContent).toContain('Chargement');
+  });
+
+  it('should subscribe to a topic and then show it as already subscribed', () => {
+    // Arrange
+    topicService.getTopics.and.returnValue(of(topics));
+    topicService.subscribe.and.returnValue(of(undefined));
+    const fixture = TestBed.createComponent(Topics);
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+
+    // Act
+    element.querySelectorAll<HTMLButtonElement>('li button')[1].click();
+    fixture.detectChanges();
+
+    // Assert
+    const button = element.querySelectorAll<HTMLButtonElement>('li button')[1];
+    expect(topicService.subscribe).toHaveBeenCalledWith(2);
+    expect(button.textContent).toContain('Déjà abonné');
+    expect(button.disabled).toBeTrue();
+  });
+
+  it('should keep the subscribe button available when the request fails', () => {
+    // Arrange
+    topicService.getTopics.and.returnValue(of(topics));
+    topicService.subscribe.and.returnValue(throwError(() => new Error('Server error')));
+    const fixture = TestBed.createComponent(Topics);
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+
+    // Act
+    element.querySelectorAll<HTMLButtonElement>('li button')[1].click();
+    fixture.detectChanges();
+
+    // Assert
+    const button = element.querySelectorAll<HTMLButtonElement>('li button')[1];
+    expect(button.textContent).toContain("S'abonner");
+    expect(button.disabled).toBeFalse();
   });
 });

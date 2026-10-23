@@ -23,4 +23,19 @@ describe('TopicService', () => {
     expect(received).toEqual(topics);
     http.verify();
   });
+
+  it('should send the subscription to the topic endpoint', () => {
+    // Arrange
+    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+    const http = TestBed.inject(HttpTestingController);
+
+    // Act
+    TestBed.inject(TopicService).subscribe(2).subscribe();
+    const request = http.expectOne('/api/topics/2/subscribe');
+    request.flush(null, { status: 204, statusText: 'No Content' });
+
+    // Assert
+    expect(request.request.method).toBe('POST');
+    http.verify();
+  });
 });

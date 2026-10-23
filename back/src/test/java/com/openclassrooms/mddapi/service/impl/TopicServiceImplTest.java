@@ -1,10 +1,12 @@
 package com.openclassrooms.mddapi.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,9 +18,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 
 import com.openclassrooms.mddapi.dto.TopicResponse;
+import com.openclassrooms.mddapi.exception.TopicNotFoundException;
 import com.openclassrooms.mddapi.mapper.TopicMapper;
 import com.openclassrooms.mddapi.model.Topic;
+import com.openclassrooms.mddapi.model.User;
 import com.openclassrooms.mddapi.repository.TopicRepository;
+import com.openclassrooms.mddapi.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 class TopicServiceImplTest {
@@ -26,12 +31,40 @@ class TopicServiceImplTest {
 	@Mock
 	private TopicRepository topicRepository;
 
+	@Mock
+	private UserRepository userRepository;
+
 	private TopicServiceImpl topicService;
 
 	@BeforeEach
 	void setUp() {
 		// The real generated mapper is used so the test also checks the field mapping
-		topicService = new TopicServiceImpl(topicRepository, Mappers.getMapper(TopicMapper.class));
+		topicService = new TopicServiceImpl(topicRepository, userRepository, Mappers.getMapper(TopicMapper.class));
+	}
+
+	@Test
+	void subscribeAddsTheTopicToTheUserSubscriptionsOnlyOnce() {
+		// Arrange
+		Topic java = topic(1, "Java");
+		User user = new User();
+		when(topicRepository.findById(1)).thenReturn(Optional.of(java));
+		when(userRepository.findById(7L)).thenReturn(Optional.of(user));
+
+		// Act
+		topicService.subscribe(7L, 1);
+		topicService.subscribe(7L, 1);
+
+		// Assert
+		assertThat(user.getSubscriptions()).containsExactly(java);
+	}
+
+	@Test
+	void subscribeRejectsAnUnknownTopic() {
+		// Arrange
+		when(topicRepository.findById(99)).thenReturn(Optional.empty());
+
+		// Act and assert
+		assertThatThrownBy(() -> topicService.subscribe(7L, 99)).isInstanceOf(TopicNotFoundException.class);
 	}
 
 	@Test
