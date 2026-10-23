@@ -85,7 +85,17 @@
       <ul class="mt-6 grid gap-4 md:grid-cols-2">
         @for (topic of profile.subscriptions; track topic.id) {
           <li class="flex">
-            <app-topic-card [topic]="topic" [headingLevel]="3" class="w-full" />
+            <app-topic-card [topic]="topic" [headingLevel]="3" class="w-full">
+              <button
+                type="button"
+                (click)="unsubscribe(topic)"
+                [disabled]="unsubscribing().has(topic.id)"
+                attr.aria-label="Se désabonner du thème {{ topic.name }}"
+                class="mx-auto w-36 rounded-md bg-primary py-2 text-sm text-white hover:bg-primary-dark disabled:opacity-60"
+              >
+                Se désabonner
+              </button>
+            </app-topic-card>
           </li>
         }
       </ul>

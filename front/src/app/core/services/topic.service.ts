@@ -20,4 +20,9 @@ export class TopicService {
   subscribe(topicId: number): Observable<void> {
     return this.http.post<void>(`/api/topics/${topicId}/subscribe`, null);
   }
+
+  /** Unsubscribes the logged-in user from a topic; unsubscribing twice has no effect. */
+  unsubscribe(topicId: number): Observable<void> {
+    return this.http.delete<void>(`/api/topics/${topicId}/subscribe`);
+  }
 }
