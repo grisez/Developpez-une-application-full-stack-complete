@@ -63,4 +63,34 @@ describe('AuthService', () => {
     expect(completed).toBeTrue();
     expect(service.isLoggedIn()).toBeFalse();
   });
+
+  it('should forget the user once logged out', () => {
+    // Arrange
+    service.login({ identifier: 'alice', password: 'Str0ng!Password' }).subscribe();
+    http.expectOne('/api/auth/login').flush(alice);
+
+    // Act
+    service.logout().subscribe();
+    const request = http.expectOne('/api/auth/logout');
+    request.flush(null, { status: 204, statusText: 'No Content' });
+
+    // Assert
+    expect(request.request.method).toBe('POST');
+    expect(service.isLoggedIn()).toBeFalse();
+  });
+
+  it('should forget the user even when the logout request fails', () => {
+    // Arrange
+    service.login({ identifier: 'alice', password: 'Str0ng!Password' }).subscribe();
+    http.expectOne('/api/auth/login').flush(alice);
+
+    // Act
+    let completed = false;
+    service.logout().subscribe({ complete: () => (completed = true) });
+    http.expectOne('/api/auth/logout').flush(null, { status: 0, statusText: 'Unknown Error' });
+
+    // Assert
+    expect(completed).toBeTrue();
+    expect(service.isLoggedIn()).toBeFalse();
+  });
 });

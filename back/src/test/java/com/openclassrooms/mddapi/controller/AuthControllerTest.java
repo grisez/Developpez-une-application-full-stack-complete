@@ -185,6 +185,25 @@ class AuthControllerTest {
 				.andExpect(status().isUnauthorized());
 	}
 
+	@Test
+	void logoutExpiresTheAuthenticationCookieEvenWithoutAValidToken() throws Exception {
+		// Act and assert
+		mockMvc.perform(post("/api/auth/logout")
+						.cookie(new Cookie("XSRF-TOKEN", CSRF_TOKEN), new Cookie(AuthCookieManager.COOKIE_NAME, "expired"))
+						.header("X-XSRF-TOKEN", CSRF_TOKEN))
+				.andExpect(status().isNoContent())
+				.andExpect(header().string(HttpHeaders.SET_COOKIE, allOf(
+						containsString(AuthCookieManager.COOKIE_NAME + "="),
+						containsString("Max-Age=0"))));
+	}
+
+	@Test
+	void logoutWithoutCsrfTokenIsForbidden() throws Exception {
+		// Act and assert
+		mockMvc.perform(post("/api/auth/logout"))
+				.andExpect(status().isForbidden());
+	}
+
 	/** A registration request carrying the CSRF cookie and header, as Angular sends it. */
 	private static MockHttpServletRequestBuilder register(String email, String username, String password) {
 		return post("/api/auth/register")

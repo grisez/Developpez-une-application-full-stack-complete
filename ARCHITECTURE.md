@@ -93,7 +93,7 @@ The token is kept in an HttpOnly cookie rather than in `localStorage`: JavaScrip
 
 - Controllers only return DTOs, never JPA entities.
 - Business rules live in services, never in controllers.
-- Every route requires a JWT, except `/api/auth/register` and `/api/auth/login`.
+- Every route requires a JWT, except `/api/auth/register`, `/api/auth/login` and `/api/auth/logout`. These three ignore the token cookie, so that an invalid token never prevents a user from logging in or out.
 - The JWT travels in an HttpOnly cookie that JavaScript cannot read. Every state-changing request must carry the CSRF token: Angular copies the `XSRF-TOKEN` cookie into the `X-XSRF-TOKEN` header.
 - Passwords are hashed with Argon2id, never stored or logged in plain text.
 - The schema only changes through a new Flyway migration. A migration that has already run is never edited.

@@ -44,6 +44,18 @@ export class AuthService {
     return this.http.post<User>('/api/auth/login', request).pipe(tap((user) => this.user.set(user)));
   }
 
+  /**
+   * Logs out: the API expires the authentication cookie, then the user is forgotten locally.
+   * The user is forgotten even if the request fails, so that logging out always works from the user's view.
+   */
+  logout(): Observable<void> {
+    return this.http.post<void>('/api/auth/logout', null).pipe(
+      catchError(() => of(undefined)),
+      tap(() => this.clearSession()),
+      map(() => undefined),
+    );
+  }
+
   /** Forgets the user locally, for instance when the API reports that the session has expired. */
   clearSession(): void {
     this.user.set(null);

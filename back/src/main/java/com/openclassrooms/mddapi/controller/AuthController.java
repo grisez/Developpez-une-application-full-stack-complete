@@ -65,6 +65,19 @@ public class AuthController {
 	}
 
 	/**
+	 * Logs the user out by making the browser delete the authentication cookie.
+	 * A JWT cannot be revoked: a copy of the token made before logout stays valid until it expires.
+	 *
+	 * @return 204 with an expired authentication cookie
+	 */
+	@PostMapping("/logout")
+	public ResponseEntity<Void> logout() {
+		return ResponseEntity.noContent()
+				.header(HttpHeaders.SET_COOKIE, authCookieManager.clearAuthCookie().toString())
+				.build();
+	}
+
+	/**
 	 * Returns the logged-in user. The front-end calls it to know whether a session is open,
 	 * since it cannot read the HttpOnly cookie that holds the token.
 	 *
