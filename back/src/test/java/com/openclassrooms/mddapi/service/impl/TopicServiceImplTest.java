@@ -59,6 +59,31 @@ class TopicServiceImplTest {
 	}
 
 	@Test
+	void unsubscribeRemovesTheTopicFromTheUserSubscriptions() {
+		// Arrange
+		Topic java = topic(1, "Java");
+		User user = new User();
+		user.getSubscriptions().add(java);
+		when(topicRepository.findById(1)).thenReturn(Optional.of(java));
+		when(userRepository.findById(7L)).thenReturn(Optional.of(user));
+
+		// Act
+		topicService.unsubscribe(7L, 1);
+
+		// Assert
+		assertThat(user.getSubscriptions()).isEmpty();
+	}
+
+	@Test
+	void unsubscribeRejectsAnUnknownTopic() {
+		// Arrange
+		when(topicRepository.findById(99)).thenReturn(Optional.empty());
+
+		// Act and assert
+		assertThatThrownBy(() -> topicService.unsubscribe(7L, 99)).isInstanceOf(TopicNotFoundException.class);
+	}
+
+	@Test
 	void subscribeRejectsAnUnknownTopic() {
 		// Arrange
 		when(topicRepository.findById(99)).thenReturn(Optional.empty());

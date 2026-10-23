@@ -5,8 +5,10 @@ import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { Profile as ProfileModel } from '../../core/models/profile';
+import { Topic } from '../../core/models/topic';
 import { AuthService } from '../../core/services/auth.service';
 import { ProfileService } from '../../core/services/profile.service';
+import { TopicService } from '../../core/services/topic.service';
 import { Header } from '../../shared/components/header/header';
 import { TopicCard } from '../../shared/components/topic-card/topic-card';
 import { TrimDirective } from '../../shared/directives/trim.directive';
@@ -29,6 +31,7 @@ import { passwordValidator } from '../../shared/validators/password.validator';
 export class Profile {
   private readonly profileService = inject(ProfileService);
   private readonly authService = inject(AuthService);
+  private readonly topicService = inject(TopicService);
 
   /** Undefined while loading; an error is reported by the error interceptor. */
   protected readonly profile = signal<ProfileModel | undefined>(undefined);
@@ -43,6 +46,9 @@ export class Profile {
   protected readonly saving = signal(false);
 
   protected readonly message = signal<{ text: string; error: boolean } | null>(null);
+
+  /** Topics whose unsubscription request is in progress, to prevent a double click. */
+  protected readonly unsubscribing = signal<ReadonlySet<number>>(new Set());
 
   constructor() {
     this.profileService
@@ -72,10 +78,33 @@ export class Profile {
     });
   }
 
+  /** Removes the topic from the list as soon as the API confirms, without reloading the page. */
+  protected unsubscribe(topic: Topic): void {
+    this.unsubscribing.update((ids) => new Set(ids).add(topic.id));
+    this.topicService.unsubscribe(topic.id).subscribe({
+      next: () => {
+        this.profile.update(
+          (profile) =>
+            profile && { ...profile, subscriptions: profile.subscriptions.filter((current) => current.id !== topic.id) },
+        );
+        this.stopUnsubscribing(topic.id);
+      },
+      error: () => this.stopUnsubscribing(topic.id),
+    });
+  }
+
   /** Whether the field should display its error: invalid and already visited by the user. */
   protected showError(field: 'username' | 'email' | 'password'): boolean {
     const control = this.form.controls[field];
     return control.invalid && control.touched;
+  }
+
+  private stopUnsubscribing(topicId: number): void {
+    this.unsubscribing.update((ids) => {
+      const next = new Set(ids);
+      next.delete(topicId);
+      return next;
+    });
   }
 
   private showProfile(profile: ProfileModel): void {

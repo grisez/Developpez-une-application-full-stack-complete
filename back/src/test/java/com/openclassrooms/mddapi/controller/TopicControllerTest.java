@@ -7,6 +7,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -49,6 +50,17 @@ class TopicControllerTest {
 		mockMvc.perform(subscribe(2))
 				.andExpect(status().isNoContent());
 		verify(topicService).subscribe(7L, 2);
+	}
+
+	@Test
+	void unsubscribeStopsFollowingTheTopicForTheLoggedInUser() throws Exception {
+		// Act and assert
+		mockMvc.perform(delete("/api/topics/{id}/subscribe", 2)
+						.with(jwt().jwt(token -> token.subject("7")))
+						.cookie(new Cookie("XSRF-TOKEN", CSRF_TOKEN))
+						.header("X-XSRF-TOKEN", CSRF_TOKEN))
+				.andExpect(status().isNoContent());
+		verify(topicService).unsubscribe(7L, 2);
 	}
 
 	@Test

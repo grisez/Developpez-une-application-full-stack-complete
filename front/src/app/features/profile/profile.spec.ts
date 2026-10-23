@@ -7,6 +7,7 @@ import { of, throwError } from 'rxjs';
 import { Profile as ProfileModel } from '../../core/models/profile';
 import { AuthService } from '../../core/services/auth.service';
 import { ProfileService } from '../../core/services/profile.service';
+import { TopicService } from '../../core/services/topic.service';
 import { Profile } from './profile';
 
 describe('Profile', () => {
@@ -17,19 +18,53 @@ describe('Profile', () => {
     subscriptions: [{ id: 1, name: 'Java', description: 'The JVM ecosystem', subscribed: true }],
   };
   let profileService: jasmine.SpyObj<ProfileService>;
+  let topicService: jasmine.SpyObj<TopicService>;
   let authService: { isLoggedIn: ReturnType<typeof signal<boolean>>; updateCurrentUser: jasmine.Spy };
 
   beforeEach(() => {
     profileService = jasmine.createSpyObj<ProfileService>('ProfileService', ['getProfile', 'updateProfile']);
+    topicService = jasmine.createSpyObj<TopicService>('TopicService', ['unsubscribe']);
     authService = { isLoggedIn: signal(true), updateCurrentUser: jasmine.createSpy('updateCurrentUser') };
     TestBed.configureTestingModule({
       imports: [Profile],
       providers: [
         provideRouter([]),
         { provide: ProfileService, useValue: profileService },
+        { provide: TopicService, useValue: topicService },
         { provide: AuthService, useValue: authService },
       ],
     });
+  });
+
+  it('should remove a topic from the subscriptions once unsubscribed, without reloading', () => {
+    // Arrange
+    topicService.unsubscribe.and.returnValue(of(undefined));
+    const { fixture, element } = render();
+
+    // Act
+    element.querySelector<HTMLButtonElement>('main li button')!.click();
+    fixture.detectChanges();
+
+    // Assert
+    expect(topicService.unsubscribe).toHaveBeenCalledWith(1);
+    expect(profileService.getProfile).toHaveBeenCalledTimes(1);
+    expect(element.querySelector('main li')).toBeNull();
+    expect(element.querySelector('main a[href="/topics"]')).not.toBeNull();
+  });
+
+  it('should keep the topic when the unsubscription fails', () => {
+    // Arrange
+    topicService.unsubscribe.and.returnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
+    const { fixture, element } = render();
+
+    // Act
+    element.querySelector<HTMLButtonElement>('main li button')!.click();
+    fixture.detectChanges();
+
+    // Assert
+    const button = element.querySelector<HTMLButtonElement>('main li button')!;
+    expect(button.textContent).toContain('Se désabonner');
+    expect(button.disabled).toBeFalse();
   });
 
   function render(profile: ProfileModel = alice): { fixture: ComponentFixture<Profile>; element: HTMLElement } {
