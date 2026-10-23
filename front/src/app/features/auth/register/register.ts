@@ -3,17 +3,15 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
-import { ProblemDetail } from '../../../core/models/problem-detail';
 import { AuthService } from '../../../core/services/auth.service';
 import { Header } from '../../../shared/components/header/header';
 import { TrimDirective } from '../../../shared/directives/trim.directive';
+import {
+  accountErrorMessage,
+  emailValidators,
+  usernameValidators,
+} from '../../../shared/validators/account.validators';
 import { passwordValidator } from '../../../shared/validators/password.validator';
-
-/** Messages shown when the API rejects a field already taken by another account. */
-const CONFLICT_MESSAGES: Record<string, string> = {
-  email: 'Cette adresse e-mail est déjà utilisée.',
-  username: "Ce nom d'utilisateur est déjà utilisé.",
-};
 
 /**
  * Registration form. The rules mirror the back-end validation, which remains the reference.
@@ -29,11 +27,8 @@ export class Register {
   private readonly router = inject(Router);
 
   protected readonly form = inject(NonNullableFormBuilder).group({
-    username: [
-      '',
-      [Validators.required, Validators.minLength(3), Validators.maxLength(30), Validators.pattern(/^[A-Za-z0-9._-]+$/)],
-    ],
-    email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
+    username: ['', usernameValidators],
+    email: ['', emailValidators],
     password: ['', [Validators.required, passwordValidator]],
   });
 
@@ -52,7 +47,7 @@ export class Register {
       next: () => this.router.navigateByUrl('/feed'),
       error: (error: HttpErrorResponse) => {
         this.submitting.set(false);
-        this.serverError.set(this.messageFor(error));
+        this.serverError.set(accountErrorMessage(error));
       },
     });
   }
@@ -61,17 +56,5 @@ export class Register {
   protected showError(field: 'username' | 'email' | 'password'): boolean {
     const control = this.form.controls[field];
     return control.invalid && control.touched;
-  }
-
-  private messageFor(error: HttpErrorResponse): string {
-    if (error.status === 409) {
-      const problem = error.error as ProblemDetail | null;
-      const field = Object.keys(problem?.errors ?? {})[0];
-      return CONFLICT_MESSAGES[field] ?? 'Ce compte existe déjà.';
-    }
-    if (error.status === 400) {
-      return 'Certains champs sont invalides. Vérifiez votre saisie.';
-    }
-    return 'Une erreur est survenue. Veuillez réessayer plus tard.';
   }
 }

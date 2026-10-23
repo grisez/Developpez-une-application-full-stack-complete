@@ -4,16 +4,79 @@
   <h1 class="text-center text-xl font-semibold">Profil utilisateur</h1>
 
   @if (profile(); as profile) {
-    <dl class="mx-auto mt-6 flex max-w-xs flex-col gap-3">
+    <!-- The labels are visually hidden, as on the mockup, but remain announced by screen readers -->
+    <form [formGroup]="form" (ngSubmit)="save()" novalidate class="mx-auto mt-6 flex max-w-xs flex-col gap-4">
       <div class="flex flex-col gap-1">
-        <dt class="text-sm">Nom d'utilisateur</dt>
-        <dd class="rounded-md border border-primary px-3 py-2">{{ profile.username }}</dd>
+        <label for="username" class="sr-only">Nom d'utilisateur</label>
+        <input
+          id="username"
+          type="text"
+          appTrim
+          formControlName="username"
+          placeholder="Nom d'utilisateur"
+          autocomplete="username"
+          class="rounded-md border border-primary px-3 py-2 focus:outline-2 focus:outline-primary"
+          [attr.aria-invalid]="showError('username')"
+          aria-describedby="username-error"
+        />
+        @if (showError('username')) {
+          <p id="username-error" class="text-sm text-red-700">
+            De 3 à 30 caractères : lettres, chiffres, points, tirets et tirets bas uniquement.
+          </p>
+        }
       </div>
+
       <div class="flex flex-col gap-1">
-        <dt class="text-sm">Adresse e-mail</dt>
-        <dd class="rounded-md border border-primary px-3 py-2">{{ profile.email }}</dd>
+        <label for="email" class="sr-only">Adresse e-mail</label>
+        <input
+          id="email"
+          type="email"
+          appTrim
+          formControlName="email"
+          placeholder="Adresse e-mail"
+          autocomplete="email"
+          class="rounded-md border border-primary px-3 py-2 focus:outline-2 focus:outline-primary"
+          [attr.aria-invalid]="showError('email')"
+          aria-describedby="email-error"
+        />
+        @if (showError('email')) {
+          <p id="email-error" class="text-sm text-red-700">Veuillez saisir une adresse e-mail valide.</p>
+        }
       </div>
-    </dl>
+
+      <div class="flex flex-col gap-1">
+        <label for="password" class="sr-only">Nouveau mot de passe (laisser vide pour le conserver)</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="Mot de passe"
+          autocomplete="new-password"
+          class="rounded-md border border-primary px-3 py-2 focus:outline-2 focus:outline-primary"
+          [attr.aria-invalid]="showError('password')"
+          aria-describedby="password-error"
+        />
+        @if (showError('password')) {
+          <p id="password-error" class="text-sm text-red-700">
+            8 caractères minimum, avec au moins un chiffre, une minuscule, une majuscule et un caractère spécial.
+          </p>
+        }
+      </div>
+
+      @if (message(); as message) {
+        <p [attr.role]="message.error ? 'alert' : 'status'" class="text-center text-sm" [class.text-red-700]="message.error">
+          {{ message.text }}
+        </p>
+      }
+
+      <button
+        type="submit"
+        [disabled]="saving()"
+        class="mx-auto mt-2 w-32 rounded-md bg-primary py-2 text-sm text-white hover:bg-primary-dark disabled:opacity-60"
+      >
+        Sauvegarder
+      </button>
+    </form>
 
     <hr class="my-8 border-gray-300" />
 

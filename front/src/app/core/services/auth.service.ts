@@ -56,6 +56,11 @@ export class AuthService {
     );
   }
 
+  /** Keeps the logged-in user in line with a change made on the profile page. */
+  updateCurrentUser(user: User): void {
+    this.user.set(user);
+  }
+
   /** Forgets the user locally, for instance when the API reports that the session has expired. */
   clearSession(): void {
     this.user.set(null);
