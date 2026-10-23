@@ -8,8 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.openclassrooms.mddapi.dto.TopicResponse;
+import com.openclassrooms.mddapi.exception.TopicNotFoundException;
+import com.openclassrooms.mddapi.exception.UserNotFoundException;
 import com.openclassrooms.mddapi.mapper.TopicMapper;
+import com.openclassrooms.mddapi.model.Topic;
+import com.openclassrooms.mddapi.model.User;
 import com.openclassrooms.mddapi.repository.TopicRepository;
+import com.openclassrooms.mddapi.repository.UserRepository;
 import com.openclassrooms.mddapi.service.TopicService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +28,8 @@ public class TopicServiceImpl implements TopicService {
 
 	private final TopicRepository topicRepository;
 
+	private final UserRepository userRepository;
+
 	private final TopicMapper topicMapper;
 
 	@Override
@@ -32,6 +39,15 @@ public class TopicServiceImpl implements TopicService {
 		return topicRepository.findAll(Sort.by("id")).stream()
 				.map(topic -> topicMapper.toResponse(topic, subscribedTopicIds.contains(topic.getId())))
 				.toList();
+	}
+
+	@Override
+	@Transactional
+	public void subscribe(Long userId, Integer topicId) {
+		Topic topic = topicRepository.findById(topicId).orElseThrow(() -> new TopicNotFoundException(topicId));
+		User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+		// Subscriptions are a Set backed by a (user_id, topic_id) primary key: a second subscription adds nothing
+		user.getSubscriptions().add(topic);
 	}
 
 }

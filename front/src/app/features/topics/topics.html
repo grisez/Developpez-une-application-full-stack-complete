@@ -14,7 +14,13 @@
               Déjà abonné
             </button>
           } @else {
-            <button type="button" class="mx-auto w-36 rounded-md bg-primary py-2 text-sm text-white hover:bg-primary-dark">
+            <button
+              type="button"
+              (click)="subscribe(topic)"
+              [disabled]="pending().has(topic.id)"
+              [attr.aria-label]="&quot;S'abonner au thème &quot; + topic.name"
+              class="mx-auto w-36 rounded-md bg-primary py-2 text-sm text-white hover:bg-primary-dark disabled:opacity-60"
+            >
               S'abonner
             </button>
           }
