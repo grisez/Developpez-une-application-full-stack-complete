@@ -128,6 +128,20 @@ class PersistenceIntegrationTest {
 	}
 
 	@Test
+	void subscribedTopicsAreSortedByName() {
+		// Arrange
+		User user = newUser("grace@mdd.dev", "grace");
+		user.getSubscriptions().addAll(topicRepository.findAll());
+		Long userId = userRepository.saveAndFlush(user).getId();
+
+		// Act
+		var names = topicRepository.findSubscribedTopics(userId).stream().map(Topic::getName).toList();
+
+		// Assert
+		assertThat(names).hasSize(8).isSortedAccordingTo(String.CASE_INSENSITIVE_ORDER);
+	}
+
+	@Test
 	void emailUniquenessIgnoresCase() {
 		// Arrange
 		userRepository.saveAndFlush(newUser("Dave@mdd.dev", "dave"));

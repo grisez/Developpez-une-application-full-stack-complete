@@ -39,7 +39,7 @@ describe('Header', () => {
     const links = Array.from(render().element.querySelectorAll('nav a')).map((link) => link.getAttribute('href'));
 
     // Assert
-    expect(links).toEqual(['/feed', '/topics']);
+    expect(links).toEqual(['/feed', '/topics', '/profile']);
   });
 
   it('should log the user out and open the home page', () => {
