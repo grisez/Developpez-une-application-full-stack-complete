@@ -35,26 +35,28 @@ class TopicControllerTest {
 	private TopicService topicService;
 
 	@Test
-	void getTopicsReturnsTheTopicsAsJson() throws Exception {
+	void getTopicsReturnsTheTopicsOfTheLoggedInUserAsJson() throws Exception {
 		// Arrange
-		when(topicService.getTopics()).thenReturn(List.of(new TopicResponse(1, "Java", "The JVM ecosystem")));
+		when(topicService.getTopics(7L))
+				.thenReturn(List.of(new TopicResponse(1, "Java", "The JVM ecosystem", true)));
 
 		// Act and assert
-		mockMvc.perform(get("/api/topics").with(jwt()))
+		mockMvc.perform(get("/api/topics").with(jwt().jwt(token -> token.subject("7"))))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasSize(1)))
 				.andExpect(jsonPath("$[0].id").value(1))
 				.andExpect(jsonPath("$[0].name").value("Java"))
-				.andExpect(jsonPath("$[0].description").value("The JVM ecosystem"));
+				.andExpect(jsonPath("$[0].description").value("The JVM ecosystem"))
+				.andExpect(jsonPath("$[0].subscribed").value(true));
 	}
 
 	@Test
 	void unexpectedErrorReturnsGenericProblemWithoutInternalDetails() throws Exception {
 		// Arrange
-		when(topicService.getTopics()).thenThrow(new IllegalStateException("database password is wrong"));
+		when(topicService.getTopics(7L)).thenThrow(new IllegalStateException("database password is wrong"));
 
 		// Act and assert
-		mockMvc.perform(get("/api/topics").with(jwt()))
+		mockMvc.perform(get("/api/topics").with(jwt().jwt(token -> token.subject("7"))))
 				.andExpect(status().isInternalServerError())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
 				.andExpect(jsonPath("$.detail").value("An unexpected error occurred."))

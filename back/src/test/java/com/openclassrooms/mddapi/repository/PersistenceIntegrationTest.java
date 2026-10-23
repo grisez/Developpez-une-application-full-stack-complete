@@ -109,6 +109,25 @@ class PersistenceIntegrationTest {
 	}
 
 	@Test
+	void subscribedTopicIdsAreThoseOfTheUserOnly() {
+		// Arrange
+		Topic first = topicRepository.findAll().get(0);
+		Topic second = topicRepository.findAll().get(1);
+		User subscriber = newUser("erin@mdd.dev", "erin");
+		subscriber.getSubscriptions().add(first);
+		User other = newUser("frank@mdd.dev", "frank");
+		other.getSubscriptions().add(second);
+		Long subscriberId = userRepository.save(subscriber).getId();
+		userRepository.saveAndFlush(other);
+
+		// Act
+		var subscribedTopicIds = topicRepository.findSubscribedTopicIds(subscriberId);
+
+		// Assert
+		assertThat(subscribedTopicIds).containsExactly(first.getId());
+	}
+
+	@Test
 	void emailUniquenessIgnoresCase() {
 		// Arrange
 		userRepository.saveAndFlush(newUser("Dave@mdd.dev", "dave"));
