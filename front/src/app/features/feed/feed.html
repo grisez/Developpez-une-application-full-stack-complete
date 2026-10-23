@@ -1,8 +1,11 @@
 <app-header />
 
 <main class="mx-auto max-w-5xl px-6 py-6 md:px-10">
+  <h1 class="sr-only">Fil d'actualité</h1>
   <div class="flex items-center justify-between gap-4">
-    <h1 class="text-xl font-semibold">Fil d'actualité</h1>
+    <a routerLink="/articles/new" class="rounded-md bg-primary px-4 py-2 text-sm text-white hover:bg-primary-dark">
+      Créer un article
+    </a>
     <button
       type="button"
       (click)="toggleSort()"

@@ -28,6 +28,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/feed/feed').then((m) => m.Feed),
   },
   {
+    path: 'articles/new',
+    title: 'Créer un article - MDD',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/posts/create-post/create-post').then((m) => m.CreatePost),
+  },
+  {
     path: 'topics',
     title: 'Thèmes - MDD',
     canActivate: [authGuard],

@@ -10,5 +10,12 @@ export interface Post {
   topicName: string;
 }
 
+/** Data sent to publish an article; the author and the date are set by the server. */
+export interface CreatePostRequest {
+  topicId: number;
+  title: string;
+  content: string;
+}
+
 /** Order of the news feed: most recent first (desc) or oldest first (asc). */
 export type FeedSort = 'desc' | 'asc';
