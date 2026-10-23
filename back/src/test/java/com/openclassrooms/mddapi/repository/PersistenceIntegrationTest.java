@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Sort;
 
 import com.openclassrooms.mddapi.TestcontainersConfiguration;
 import com.openclassrooms.mddapi.model.Comment;
@@ -128,6 +129,32 @@ class PersistenceIntegrationTest {
 	}
 
 	@Test
+	void feedOnlyContainsThePostsOfTheSubscribedTopicsInTheRequestedOrder() {
+		// Arrange
+		Topic followed = topicRepository.findAll().get(0);
+		Topic other = topicRepository.findAll().get(1);
+		User reader = newUser("nina@mdd.dev", "nina");
+		reader.getSubscriptions().add(followed);
+		Long readerId = userRepository.save(reader).getId();
+		User author = userRepository.save(newUser("oscar@mdd.dev", "oscar"));
+		Post older = postRepository.saveAndFlush(newPost("Older", author, followed));
+		postRepository.saveAndFlush(newPost("Not followed", author, other));
+		Post newer = postRepository.saveAndFlush(newPost("Newer", author, followed));
+		entityManager.clear();
+
+		// Act
+		var mostRecentFirst = postRepository.findFeed(readerId,
+				Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.DESC, "id")));
+		var oldestFirst = postRepository.findFeed(readerId,
+				Sort.by(Sort.Direction.ASC, "createdAt").and(Sort.by(Sort.Direction.ASC, "id")));
+
+		// Assert
+		assertThat(mostRecentFirst).extracting(Post::getId).containsExactly(newer.getId(), older.getId());
+		assertThat(oldestFirst).extracting(Post::getId).containsExactly(older.getId(), newer.getId());
+		assertThat(mostRecentFirst.getFirst().getAuthor().getUsername()).isEqualTo("oscar");
+	}
+
+	@Test
 	void subscribedTopicsAreSortedByName() {
 		// Arrange
 		User user = newUser("grace@mdd.dev", "grace");
@@ -150,6 +177,15 @@ class PersistenceIntegrationTest {
 		// Act and assert
 		assertThatThrownBy(() -> userRepository.saveAndFlush(duplicate))
 				.isInstanceOf(DataIntegrityViolationException.class);
+	}
+
+	private static Post newPost(String title, User author, Topic topic) {
+		Post post = new Post();
+		post.setTitle(title);
+		post.setContent("Content of " + title);
+		post.setAuthor(author);
+		post.setTopic(topic);
+		return post;
 	}
 
 	private static User newUser(String email, String username) {
