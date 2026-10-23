@@ -1,5 +1,8 @@
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
 import {
   ApplicationConfig,
+  LOCALE_ID,
   inject,
   provideAppInitializer,
   provideBrowserGlobalErrorListeners,
@@ -12,6 +15,9 @@ import { routes } from './app.routes';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { AuthService } from './core/services/auth.service';
 
+// Dates are displayed in French, for example "23 octobre 2026"
+registerLocaleData(localeFr);
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
@@ -20,5 +26,6 @@ export const appConfig: ApplicationConfig = {
     // The XSRF protection of HttpClient sends the XSRF-TOKEN cookie back in the X-XSRF-TOKEN header
     provideHttpClient(withFetch(), withInterceptors([errorInterceptor])),
     provideAppInitializer(() => inject(AuthService).loadCurrentUser()),
+    { provide: LOCALE_ID, useValue: 'fr-FR' },
   ],
 };
