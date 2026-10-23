@@ -1,5 +1,6 @@
 package com.openclassrooms.mddapi.repository;
 
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,5 +20,14 @@ public interface TopicRepository extends JpaRepository<Topic, Integer> {
 	 */
 	@Query("select topic.id from User user join user.subscriptions topic where user.id = :userId")
 	Set<Integer> findSubscribedTopicIds(Long userId);
+
+	/**
+	 * Returns the topics a user is subscribed to, sorted by name, in a single query.
+	 *
+	 * @param userId the user id
+	 * @return the subscribed topics
+	 */
+	@Query("select topic from User user join user.subscriptions topic where user.id = :userId order by topic.name")
+	List<Topic> findSubscribedTopics(Long userId);
 
 }

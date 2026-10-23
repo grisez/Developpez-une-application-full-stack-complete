@@ -1,7 +1,12 @@
 package com.openclassrooms.mddapi.mapper;
 
-import org.mapstruct.Mapper;
+import java.util.List;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import com.openclassrooms.mddapi.dto.ProfileResponse;
+import com.openclassrooms.mddapi.dto.TopicResponse;
 import com.openclassrooms.mddapi.dto.UserResponse;
 import com.openclassrooms.mddapi.model.User;
 
@@ -18,5 +23,16 @@ public interface UserMapper {
 	 * @return the user response
 	 */
 	UserResponse toResponse(User user);
+
+	/**
+	 * Builds the profile of a user.
+	 *
+	 * @param user          the entity to convert
+	 * @param subscriptions the topics the user is subscribed to
+	 * @return the profile response
+	 */
+	// The entity also has a subscriptions property: the parameter must be named explicitly to take precedence
+	@Mapping(target = "subscriptions", source = "subscriptions")
+	ProfileResponse toProfile(User user, List<TopicResponse> subscriptions);
 
 }
