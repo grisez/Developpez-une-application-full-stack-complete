@@ -1,5 +1,45 @@
 <app-header />
 
-<main class="px-6 py-6 md:px-10">
-  <h1 class="text-xl font-semibold">Fil d'actualité</h1>
+<main class="mx-auto max-w-5xl px-6 py-6 md:px-10">
+  <div class="flex items-center justify-between gap-4">
+    <h1 class="text-xl font-semibold">Fil d'actualité</h1>
+    <button
+      type="button"
+      (click)="toggleSort()"
+      class="flex items-center gap-1 text-sm font-semibold hover:underline"
+      [attr.aria-label]="
+        sort() === 'desc'
+          ? 'Trié du plus récent au plus ancien. Trier du plus ancien au plus récent'
+          : 'Trié du plus ancien au plus récent. Trier du plus récent au plus ancien'
+      "
+    >
+      Trier par
+      <span aria-hidden="true">{{ sort() === 'desc' ? '↓' : '↑' }}</span>
+    </button>
+  </div>
+
+  @if (posts(); as posts) {
+    @if (posts.length > 0) {
+      <ul class="mt-6 grid gap-4 md:grid-cols-2">
+        @for (post of posts; track post.id) {
+          <li class="flex flex-col gap-2 rounded-lg bg-gray-100 p-4">
+            <h2 class="font-semibold">{{ post.title }}</h2>
+            <p class="flex gap-6 text-sm text-gray-700">
+              <time [attr.datetime]="post.createdAt">{{ post.createdAt | date: 'longDate' }}</time>
+              <span>{{ post.authorUsername }}</span>
+            </p>
+            <p class="line-clamp-4 text-sm">{{ post.content }}</p>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="mt-6 text-center">
+        Votre fil est vide pour le moment.
+        <a routerLink="/topics" class="text-primary underline">Abonnez-vous à des thèmes</a>
+        pour y voir leurs articles.
+      </p>
+    }
+  } @else {
+    <p role="status" class="mt-6 text-center">Chargement des articles…</p>
+  }
 </main>
