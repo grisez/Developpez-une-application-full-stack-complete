@@ -1,0 +1,18 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
+
+import { Topic } from '../models/topic';
+
+/**
+ * Talks to the topic endpoints.
+ */
+@Injectable({ providedIn: 'root' })
+export class TopicService {
+  private readonly http = inject(HttpClient);
+
+  /** Every topic, with the subscription state of the logged-in user. */
+  getTopics(): Observable<Topic[]> {
+    return this.http.get<Topic[]>('/api/topics');
+  }
+}

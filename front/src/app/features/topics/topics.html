@@ -1,0 +1,29 @@
+<app-header />
+
+<main class="mx-auto max-w-5xl px-6 py-6 md:px-10">
+  <h1 class="sr-only">Thèmes</h1>
+
+  @if (topics(); as topics) {
+    <ul class="grid gap-4 md:grid-cols-2">
+      @for (topic of topics; track topic.id) {
+        <li class="flex flex-col gap-3 rounded-lg bg-gray-100 p-4">
+          <h2 class="font-semibold">{{ topic.name }}</h2>
+          <p class="flex-1 text-sm">{{ topic.description }}</p>
+          @if (topic.subscribed) {
+            <button type="button" disabled class="mx-auto w-36 rounded-md bg-gray-400 py-2 text-sm text-white">
+              Déjà abonné
+            </button>
+          } @else {
+            <button type="button" class="mx-auto w-36 rounded-md bg-primary py-2 text-sm text-white hover:bg-primary-dark">
+              S'abonner
+            </button>
+          }
+        </li>
+      } @empty {
+        <li>Aucun thème pour le moment.</li>
+      }
+    </ul>
+  } @else {
+    <p role="status">Chargement des thèmes…</p>
+  }
+</main>

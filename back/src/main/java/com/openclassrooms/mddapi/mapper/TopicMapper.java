@@ -14,9 +14,10 @@ public interface TopicMapper {
 	/**
 	 * Builds the API representation of a topic.
 	 *
-	 * @param topic the entity to convert
+	 * @param topic      the entity to convert
+	 * @param subscribed whether the logged-in user is subscribed to the topic
 	 * @return the topic response
 	 */
-	TopicResponse toResponse(Topic topic);
+	TopicResponse toResponse(Topic topic, boolean subscribed);
 
 }

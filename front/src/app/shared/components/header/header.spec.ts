@@ -31,6 +31,17 @@ describe('Header', () => {
     expect(render().element.querySelector('nav')).toBeNull();
   });
 
+  it('should give a logged-in user access to the articles and the topics', () => {
+    // Arrange
+    loggedIn.set(true);
+
+    // Act
+    const links = Array.from(render().element.querySelectorAll('nav a')).map((link) => link.getAttribute('href'));
+
+    // Assert
+    expect(links).toEqual(['/feed', '/topics']);
+  });
+
   it('should log the user out and open the home page', () => {
     // Arrange
     loggedIn.set(true);

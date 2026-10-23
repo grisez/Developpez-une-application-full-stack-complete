@@ -1,6 +1,6 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -10,7 +10,7 @@ import { AuthService } from '../../../core/services/auth.service';
  */
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, NgTemplateOutlet],
+  imports: [RouterLink, RouterLinkActive, NgTemplateOutlet],
   templateUrl: './header.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {

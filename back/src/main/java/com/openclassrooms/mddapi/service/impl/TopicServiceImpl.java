@@ -1,7 +1,9 @@
 package com.openclassrooms.mddapi.service.impl;
 
 import java.util.List;
+import java.util.Set;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,9 +27,10 @@ public class TopicServiceImpl implements TopicService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<TopicResponse> getTopics() {
-		return topicRepository.findAll().stream()
-				.map(topicMapper::toResponse)
+	public List<TopicResponse> getTopics(Long userId) {
+		Set<Integer> subscribedTopicIds = topicRepository.findSubscribedTopicIds(userId);
+		return topicRepository.findAll(Sort.by("id")).stream()
+				.map(topic -> topicMapper.toResponse(topic, subscribedTopicIds.contains(topic.getId())))
 				.toList();
 	}
 

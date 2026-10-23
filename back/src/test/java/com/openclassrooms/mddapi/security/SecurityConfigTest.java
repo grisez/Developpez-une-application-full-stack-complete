@@ -61,7 +61,7 @@ class SecurityConfigTest {
 	@Test
 	void requestWithValidTokenCookieIsAuthenticated() throws Exception {
 		// Arrange
-		when(topicService.getTopics()).thenReturn(List.of());
+		when(topicService.getTopics(1L)).thenReturn(List.of());
 		String token = new JwtService(jwtEncoder, jwtProperties).generateToken(user(1L));
 
 		// Act and assert
