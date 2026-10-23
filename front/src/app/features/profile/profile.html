@@ -1,0 +1,38 @@
+<app-header />
+
+<main class="mx-auto max-w-5xl px-6 py-6 md:px-10">
+  <h1 class="text-center text-xl font-semibold">Profil utilisateur</h1>
+
+  @if (profile(); as profile) {
+    <dl class="mx-auto mt-6 flex max-w-xs flex-col gap-3">
+      <div class="flex flex-col gap-1">
+        <dt class="text-sm">Nom d'utilisateur</dt>
+        <dd class="rounded-md border border-primary px-3 py-2">{{ profile.username }}</dd>
+      </div>
+      <div class="flex flex-col gap-1">
+        <dt class="text-sm">Adresse e-mail</dt>
+        <dd class="rounded-md border border-primary px-3 py-2">{{ profile.email }}</dd>
+      </div>
+    </dl>
+
+    <hr class="my-8 border-gray-300" />
+
+    <h2 class="text-center text-xl font-semibold">Abonnements</h2>
+    @if (profile.subscriptions.length > 0) {
+      <ul class="mt-6 grid gap-4 md:grid-cols-2">
+        @for (topic of profile.subscriptions; track topic.id) {
+          <li class="flex">
+            <app-topic-card [topic]="topic" [headingLevel]="3" class="w-full" />
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="mt-6 text-center">
+        Vous n'êtes abonné à aucun thème.
+        <a routerLink="/topics" class="text-primary underline">Découvrir les thèmes</a>
+      </p>
+    }
+  } @else {
+    <p role="status" class="mt-6 text-center">Chargement du profil…</p>
+  }
+</main>

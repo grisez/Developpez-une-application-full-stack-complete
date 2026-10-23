@@ -34,6 +34,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/topics/topics').then((m) => m.Topics),
   },
   {
+    path: 'profile',
+    title: 'Profil - MDD',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/profile/profile').then((m) => m.Profile),
+  },
+  {
     path: '**',
     loadComponent: () => import('./features/not-found/not-found').then((m) => m.NotFound),
   },

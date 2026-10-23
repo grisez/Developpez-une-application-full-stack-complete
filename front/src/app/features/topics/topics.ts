@@ -4,13 +4,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Topic } from '../../core/models/topic';
 import { TopicService } from '../../core/services/topic.service';
 import { Header } from '../../shared/components/header/header';
+import { TopicCard } from '../../shared/components/topic-card/topic-card';
 
 /**
  * Page listing every topic, whether the user is subscribed to it or not, with a button to subscribe.
  */
 @Component({
   selector: 'app-topics',
-  imports: [Header],
+  imports: [Header, TopicCard],
   templateUrl: './topics.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
