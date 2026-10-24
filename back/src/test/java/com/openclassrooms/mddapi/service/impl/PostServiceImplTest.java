@@ -21,13 +21,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 
+import com.openclassrooms.mddapi.dto.CommentResponse;
 import com.openclassrooms.mddapi.dto.CreatePostRequest;
+import com.openclassrooms.mddapi.dto.PostDetailResponse;
 import com.openclassrooms.mddapi.dto.PostResponse;
+import com.openclassrooms.mddapi.exception.PostNotFoundException;
 import com.openclassrooms.mddapi.exception.TopicNotFoundException;
 import com.openclassrooms.mddapi.mapper.PostMapper;
+import com.openclassrooms.mddapi.model.Comment;
 import com.openclassrooms.mddapi.model.Post;
 import com.openclassrooms.mddapi.model.Topic;
 import com.openclassrooms.mddapi.model.User;
+import com.openclassrooms.mddapi.repository.CommentRepository;
 import com.openclassrooms.mddapi.repository.PostRepository;
 import com.openclassrooms.mddapi.repository.TopicRepository;
 import com.openclassrooms.mddapi.repository.UserRepository;
@@ -39,6 +44,9 @@ class PostServiceImplTest {
 	private PostRepository postRepository;
 
 	@Mock
+	private CommentRepository commentRepository;
+
+	@Mock
 	private TopicRepository topicRepository;
 
 	@Mock
@@ -48,8 +56,40 @@ class PostServiceImplTest {
 
 	@BeforeEach
 	void setUp() {
-		postService = new PostServiceImpl(postRepository, topicRepository, userRepository,
+		postService = new PostServiceImpl(postRepository, commentRepository, topicRepository, userRepository,
 				Mappers.getMapper(PostMapper.class));
+	}
+
+	@Test
+	void getByIdReturnsTheArticleWithItsComments() {
+		// Arrange
+		Post post = post(Instant.parse("2026-10-20T10:00:00Z"));
+		Comment comment = new Comment();
+		comment.setId(9L);
+		comment.setContent("Nice post");
+		comment.setCreatedAt(Instant.parse("2026-10-21T08:00:00Z"));
+		comment.setAuthor(post.getAuthor());
+		when(postRepository.findDetailById(1L)).thenReturn(Optional.of(post));
+		when(commentRepository.findByPostIdOldestFirst(1L)).thenReturn(List.of(comment));
+
+		// Act
+		PostDetailResponse detail = postService.getById(1L);
+
+		// Assert
+		assertThat(detail.title()).isEqualTo("Hello");
+		assertThat(detail.content()).isEqualTo("First post");
+		assertThat(detail.topicName()).isEqualTo("Java");
+		assertThat(detail.comments()).containsExactly(
+				new CommentResponse(9L, "Nice post", Instant.parse("2026-10-21T08:00:00Z"), "alice"));
+	}
+
+	@Test
+	void getByIdThrowsWhenTheArticleDoesNotExist() {
+		// Arrange
+		when(postRepository.findDetailById(99L)).thenReturn(Optional.empty());
+
+		// Act and assert
+		assertThatThrownBy(() -> postService.getById(99L)).isInstanceOf(PostNotFoundException.class);
 	}
 
 	@Test

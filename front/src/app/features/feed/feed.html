@@ -25,13 +25,18 @@
     @if (posts.length > 0) {
       <ul class="mt-6 grid gap-4 md:grid-cols-2">
         @for (post of posts; track post.id) {
-          <li class="flex flex-col gap-2 rounded-lg bg-gray-100 p-4">
-            <h2 class="font-semibold">{{ post.title }}</h2>
-            <p class="flex gap-6 text-sm text-gray-700">
-              <time [attr.datetime]="post.createdAt">{{ post.createdAt | date: 'longDate' }}</time>
-              <span>{{ post.authorUsername }}</span>
-            </p>
-            <p class="line-clamp-4 text-sm">{{ post.content }}</p>
+          <li class="flex">
+            <a
+              [routerLink]="['/articles', post.id]"
+              class="flex w-full flex-col gap-2 rounded-lg bg-gray-100 p-4 hover:bg-gray-200 focus:outline-2 focus:outline-primary"
+            >
+              <h2 class="font-semibold">{{ post.title }}</h2>
+              <p class="flex gap-6 text-sm text-gray-700">
+                <time [attr.datetime]="post.createdAt">{{ post.createdAt | date: 'longDate' }}</time>
+                <span>{{ post.authorUsername }}</span>
+              </p>
+              <p class="line-clamp-4 text-sm">{{ post.content }}</p>
+            </a>
           </li>
         }
       </ul>

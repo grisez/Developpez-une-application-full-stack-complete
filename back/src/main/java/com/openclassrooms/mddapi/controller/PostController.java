@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.openclassrooms.mddapi.dto.CreatePostRequest;
+import com.openclassrooms.mddapi.dto.PostDetailResponse;
 import com.openclassrooms.mddapi.dto.PostResponse;
 import com.openclassrooms.mddapi.service.PostService;
 
@@ -43,6 +45,17 @@ public class PostController {
 	public List<PostResponse> getFeed(@AuthenticationPrincipal Jwt jwt,
 			@RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort) {
 		return postService.getFeed(Long.valueOf(jwt.getSubject()), Sort.Direction.fromString(sort));
+	}
+
+	/**
+	 * Returns an article with its comments, oldest first.
+	 *
+	 * @param id the article id
+	 * @return the article and its comments
+	 */
+	@GetMapping("/{id}")
+	public PostDetailResponse getById(@PathVariable Long id) {
+		return postService.getById(id);
 	}
 
 	/**

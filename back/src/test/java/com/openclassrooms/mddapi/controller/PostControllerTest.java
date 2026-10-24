@@ -26,8 +26,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
+import com.openclassrooms.mddapi.dto.CommentResponse;
 import com.openclassrooms.mddapi.dto.CreatePostRequest;
+import com.openclassrooms.mddapi.dto.PostDetailResponse;
 import com.openclassrooms.mddapi.dto.PostResponse;
+import com.openclassrooms.mddapi.exception.PostNotFoundException;
 import com.openclassrooms.mddapi.exception.TopicNotFoundException;
 import com.openclassrooms.mddapi.security.SecurityConfig;
 import com.openclassrooms.mddapi.service.PostService;
@@ -65,6 +68,33 @@ class PostControllerTest {
 
 		// Assert
 		verify(postService).getFeed(7L, Sort.Direction.ASC);
+	}
+
+	@Test
+	void getByIdReturnsTheArticleWithItsComments() throws Exception {
+		// Arrange
+		when(postService.getById(5L)).thenReturn(new PostDetailResponse(5L, "Hello", "First post",
+				Instant.parse("2026-10-20T10:00:00Z"), "alice", 2, "Java",
+				List.of(new CommentResponse(9L, "Nice post", Instant.parse("2026-10-21T08:00:00Z"), "bob"))));
+
+		// Act and assert
+		mockMvc.perform(get("/api/articles/5").with(jwt().jwt(token -> token.subject("7"))))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.title").value("Hello"))
+				.andExpect(jsonPath("$.topicName").value("Java"))
+				.andExpect(jsonPath("$.comments[0].content").value("Nice post"))
+				.andExpect(jsonPath("$.comments[0].authorUsername").value("bob"));
+	}
+
+	@Test
+	void getByIdReturnsNotFoundForAnUnknownArticle() throws Exception {
+		// Arrange
+		when(postService.getById(99L)).thenThrow(new PostNotFoundException(99L));
+
+		// Act and assert
+		mockMvc.perform(get("/api/articles/99").with(jwt().jwt(token -> token.subject("7"))))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.detail").value("Article not found."));
 	}
 
 	@Test

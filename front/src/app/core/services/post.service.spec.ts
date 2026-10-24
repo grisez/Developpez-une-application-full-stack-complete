@@ -20,6 +20,21 @@ describe('PostService', () => {
     http.verify();
   });
 
+  it('should fetch an article by its id', () => {
+    // Arrange
+    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+    const http = TestBed.inject(HttpTestingController);
+
+    // Act
+    TestBed.inject(PostService).getById(5).subscribe();
+    const request = http.expectOne('/api/articles/5');
+    request.flush({});
+
+    // Assert
+    expect(request.request.method).toBe('GET');
+    http.verify();
+  });
+
   it('should send a new article with POST', () => {
     // Arrange
     TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });

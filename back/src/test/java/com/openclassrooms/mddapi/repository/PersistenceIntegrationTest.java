@@ -155,6 +155,25 @@ class PersistenceIntegrationTest {
 	}
 
 	@Test
+	void articleDetailComesWithItsCommentsOldestFirst() {
+		// Arrange
+		User author = userRepository.save(newUser("rose@mdd.dev", "rose"));
+		Post post = postRepository.save(newPost("Detail", author, topicRepository.findAll().getFirst()));
+		Comment first = commentRepository.saveAndFlush(newComment("First", author, post));
+		Comment second = commentRepository.saveAndFlush(newComment("Second", author, post));
+		entityManager.clear();
+
+		// Act
+		Post detail = postRepository.findDetailById(post.getId()).orElseThrow();
+		var comments = commentRepository.findByPostIdOldestFirst(post.getId());
+
+		// Assert
+		assertThat(detail.getTopic().getName()).isNotBlank();
+		assertThat(comments).extracting(Comment::getId).containsExactly(first.getId(), second.getId());
+		assertThat(comments.getFirst().getAuthor().getUsername()).isEqualTo("rose");
+	}
+
+	@Test
 	void subscribedTopicsAreSortedByName() {
 		// Arrange
 		User user = newUser("grace@mdd.dev", "grace");
@@ -177,6 +196,14 @@ class PersistenceIntegrationTest {
 		// Act and assert
 		assertThatThrownBy(() -> userRepository.saveAndFlush(duplicate))
 				.isInstanceOf(DataIntegrityViolationException.class);
+	}
+
+	private static Comment newComment(String content, User author, Post post) {
+		Comment comment = new Comment();
+		comment.setContent(content);
+		comment.setAuthor(author);
+		comment.setPost(post);
+		return comment;
 	}
 
 	private static Post newPost(String title, User author, Topic topic) {

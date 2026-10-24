@@ -1,6 +1,7 @@
 package com.openclassrooms.mddapi.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,5 +28,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 			where post.topic.id in (
 				select topic.id from User user join user.subscriptions topic where user.id = :userId)""")
 	List<Post> findFeed(Long userId, Sort sort);
+
+	/**
+	 * Returns an article with its author and its topic fetched in the same query.
+	 *
+	 * @param id the article id
+	 * @return the article, if it exists
+	 */
+	@Query("select post from Post post join fetch post.author join fetch post.topic where post.id = :id")
+	Optional<Post> findDetailById(Long id);
 
 }
