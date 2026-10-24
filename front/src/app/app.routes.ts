@@ -34,6 +34,13 @@ export const routes: Routes = [
     loadComponent: () => import('./features/posts/create-post/create-post').then((m) => m.CreatePost),
   },
   {
+    // Declared after 'articles/new', so that "new" is never read as an article id
+    path: 'articles/:id',
+    title: 'Article - MDD',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/posts/post-detail/post-detail').then((m) => m.PostDetail),
+  },
+  {
     path: 'topics',
     title: 'Thèmes - MDD',
     canActivate: [authGuard],

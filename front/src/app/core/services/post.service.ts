@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { CreatePostRequest, FeedSort, Post } from '../models/post';
+import { CreatePostRequest, FeedSort, Post, PostDetail } from '../models/post';
 
 /**
  * Talks to the article endpoints.
@@ -14,6 +14,11 @@ export class PostService {
   /** The articles of the topics the logged-in user is subscribed to. */
   getFeed(sort: FeedSort): Observable<Post[]> {
     return this.http.get<Post[]>('/api/articles', { params: { sort } });
+  }
+
+  /** An article with its comments, oldest first. */
+  getById(id: number): Observable<PostDetail> {
+    return this.http.get<PostDetail>(`/api/articles/${id}`);
   }
 
   /** Publishes an article written by the logged-in user. */
