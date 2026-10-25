@@ -97,8 +97,19 @@ The schema is created and versioned by Flyway when the back-end starts. Hibernat
 | Location | Content | Loaded |
 | --- | --- | --- |
 | `back/src/main/resources/db/migration` | Schema (`V1`) and reference topics (`V2`) | Every environment |
+| `back/src/main/resources/db/dev-data` | Demo accounts, subscriptions, articles and comments (`R__seed_dev_data.sql`) | `dev` profile only |
 
-A migration that has already run is never edited: every schema change goes through a new `V<n>__<description>.sql` file.
+A migration that has already run is never edited: every schema change goes through a new `V<n>__<description>.sql` file. The demo data script is repeatable: Flyway replays it when it changes, without creating duplicates.
+
+### Demo accounts (development only)
+
+These accounts only exist with the `dev` profile. They all use the password `Demo!Mdd2026`.
+
+| Username | Email | Subscriptions |
+| --- | --- | --- |
+| `alice` | `alice@mdd.dev` | Java, Angular, Spring |
+| `bob` | `bob@mdd.dev` | Java, JavaScript, DevOps |
+| `carol` | `carol@mdd.dev` | None, to show the empty feed |
 
 If your local database was created before Flyway was introduced, reset it once with `docker compose --profile app down -v`.
 
@@ -106,7 +117,7 @@ If your local database was created before Flyway was introduced, reset it once w
 
 | Profile | Usage |
 | --- | --- |
-| `dev` | Local development: SQL logged. Enabled by Docker Compose. |
+| `dev` | Local development: SQL logged, demo data loaded. Enabled by Docker Compose. |
 | `prod` | Production: reduced logging. |
 
 ## Tests
