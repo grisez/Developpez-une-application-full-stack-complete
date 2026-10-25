@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { CreatePostRequest, FeedSort, Post, PostDetail } from '../models/post';
+import { CreatePostRequest, FeedSort, Post, PostComment, PostDetail } from '../models/post';
 
 /**
  * Talks to the article endpoints.
@@ -19,6 +19,11 @@ export class PostService {
   /** An article with its comments, oldest first. */
   getById(id: number): Observable<PostDetail> {
     return this.http.get<PostDetail>(`/api/articles/${id}`);
+  }
+
+  /** Adds a comment written by the logged-in user to an article. */
+  addComment(postId: number, content: string): Observable<PostComment> {
+    return this.http.post<PostComment>(`/api/articles/${postId}/comments`, { content });
   }
 
   /** Publishes an article written by the logged-in user. */
