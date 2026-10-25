@@ -12,6 +12,9 @@ import com.openclassrooms.mddapi.dto.ProfileResponse;
 import com.openclassrooms.mddapi.dto.UpdateProfileRequest;
 import com.openclassrooms.mddapi.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/me")
 @RequiredArgsConstructor
+@Tag(name = "Profile", description = "Profile of the logged-in user")
 public class ProfileController {
 
 	private final UserService userService;
@@ -32,6 +36,9 @@ public class ProfileController {
 	 * @return the profile
 	 */
 	@GetMapping
+	@Operation(summary = "Get my profile", description = "Email, username and subscriptions; never the password.")
+	@ApiResponse(responseCode = "200", description = "The profile")
+	@ApiResponse(responseCode = "401", description = "No valid session")
 	public ProfileResponse getProfile(@AuthenticationPrincipal Jwt jwt) {
 		return userService.getProfile(Long.valueOf(jwt.getSubject()));
 	}
@@ -45,6 +52,13 @@ public class ProfileController {
 	 * @return the updated profile
 	 */
 	@PutMapping
+	@Operation(summary = "Update my profile",
+			description = "Same rules as the registration; an empty password keeps the current one.")
+	@ApiResponse(responseCode = "200", description = "The updated profile")
+	@ApiResponse(responseCode = "400", description = "Invalid fields, detailed in the errors property")
+	@ApiResponse(responseCode = "401", description = "No valid session")
+	@ApiResponse(responseCode = "403", description = "Missing or invalid CSRF token")
+	@ApiResponse(responseCode = "409", description = "Email or username used by another account")
 	public ProfileResponse updateProfile(@AuthenticationPrincipal Jwt jwt,
 			@Valid @RequestBody UpdateProfileRequest request) {
 		return userService.updateProfile(Long.valueOf(jwt.getSubject()), request);
