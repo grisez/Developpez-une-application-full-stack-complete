@@ -118,7 +118,29 @@ If your local database was created before Flyway was introduced, reset it once w
 | Profile | Usage |
 | --- | --- |
 | `dev` | Local development: SQL logged, demo data loaded. Enabled by Docker Compose. |
-| `prod` | Production: reduced logging. |
+| `prod` | Production: reduced logging, API documentation disabled. |
+
+## API
+
+The interactive documentation is available outside production at http://localhost:9000/swagger-ui.html, and the OpenAPI description at http://localhost:9000/v3/api-docs. To try a protected endpoint, call `POST /api/auth/login` first: the authentication cookie is then sent with the next requests.
+
+Every endpoint requires the authentication cookie, except register, login and logout. Every `POST`, `PUT` and `DELETE` request must carry the CSRF token in the `X-XSRF-TOKEN` header. Errors follow RFC 9457 (problem details).
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/auth/register` | Create an account and log in |
+| `POST` | `/api/auth/login` | Log in with an email or a username |
+| `POST` | `/api/auth/logout` | Log out |
+| `GET` | `/api/auth/me` | Current user, to restore the session |
+| `GET` | `/api/me` | My profile and subscriptions |
+| `PUT` | `/api/me` | Update my email, username or password |
+| `GET` | `/api/topics` | All topics, with my subscription state |
+| `POST` | `/api/topics/{id}/subscribe` | Subscribe to a topic |
+| `DELETE` | `/api/topics/{id}/subscribe` | Unsubscribe from a topic |
+| `GET` | `/api/articles?sort=desc\|asc` | News feed: articles of my topics |
+| `GET` | `/api/articles/{id}` | An article with its comments |
+| `POST` | `/api/articles` | Publish an article |
+| `POST` | `/api/articles/{id}/comments` | Comment on an article |
 
 ## Tests
 
