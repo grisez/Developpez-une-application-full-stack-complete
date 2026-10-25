@@ -60,6 +60,28 @@ class PostIntegrationTest {
 				.andExpect(jsonPath("$[0].authorUsername").value("paul"));
 	}
 
+	@Test
+	void commentGetsItsAuthorFromTheServerAndAppearsOnTheArticlePage() throws Exception {
+		// Arrange
+		Cookie author = register("rita");
+		Cookie reader = register("sam");
+		String body = mockMvc.perform(withCsrf(post("/api/articles")).cookie(CSRF_COOKIE, author).content("""
+						{"topicId": 6, "title": "To comment", "content": "Article"}"""))
+				.andReturn().getResponse().getContentAsString();
+		Integer postId = JsonPath.read(body, "$.id");
+
+		// Act: the author sent by the client must be ignored
+		mockMvc.perform(withCsrf(post("/api/articles/{id}/comments", postId)).cookie(CSRF_COOKIE, reader).content("""
+						{"content": "Nice post", "authorUsername": "someone-else"}"""))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.authorUsername").value("sam"));
+
+		// Assert
+		mockMvc.perform(get("/api/articles/{id}", postId).cookie(reader))
+				.andExpect(jsonPath("$.comments[0].content").value("Nice post"))
+				.andExpect(jsonPath("$.comments[0].authorUsername").value("sam"));
+	}
+
 	private Cookie register(String username) throws Exception {
 		return mockMvc.perform(withCsrf(post("/api/auth/register")).content("""
 						{"email": "%s@mdd.dev", "username": "%s", "password": "Str0ng!Password"}"""

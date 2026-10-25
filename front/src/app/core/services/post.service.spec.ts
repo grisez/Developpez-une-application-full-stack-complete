@@ -35,6 +35,22 @@ describe('PostService', () => {
     http.verify();
   });
 
+  it('should send a comment to the comments of the article', () => {
+    // Arrange
+    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+    const http = TestBed.inject(HttpTestingController);
+
+    // Act
+    TestBed.inject(PostService).addComment(5, 'Nice post').subscribe();
+    const request = http.expectOne('/api/articles/5/comments');
+    request.flush({});
+
+    // Assert
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ content: 'Nice post' });
+    http.verify();
+  });
+
   it('should send a new article with POST', () => {
     // Arrange
     TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });

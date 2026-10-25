@@ -19,9 +19,9 @@
 
     <section aria-labelledby="comments-title">
       <h2 id="comments-title" class="text-lg font-semibold">Commentaires</h2>
-      @if (page.post.comments.length > 0) {
+      @if (comments().length > 0) {
         <ul class="mt-4 flex flex-col gap-3">
-          @for (comment of page.post.comments; track comment.id) {
+          @for (comment of comments(); track comment.id) {
             <li class="flex flex-col gap-1 md:flex-row md:items-start md:gap-4">
               <span class="text-sm text-gray-700 md:w-32 md:shrink-0 md:pt-2">{{ comment.authorUsername }}</span>
               <p class="flex-1 whitespace-pre-line rounded-lg bg-gray-100 px-4 py-2 text-sm">{{ comment.content }}</p>
@@ -31,6 +31,39 @@
       } @else {
         <p class="mt-4 text-sm">Aucun commentaire pour le moment.</p>
       }
+
+      <form [formGroup]="commentForm" (ngSubmit)="sendComment()" novalidate class="mt-6 flex items-end gap-3">
+        <div class="flex flex-1 flex-col gap-1">
+          <label for="comment" class="sr-only">Votre commentaire</label>
+          <textarea
+            id="comment"
+            formControlName="content"
+            placeholder="Écrivez ici votre commentaire"
+            rows="3"
+            maxlength="1000"
+            class="rounded-md border border-primary px-3 py-2 focus:outline-2 focus:outline-primary"
+            [attr.aria-invalid]="showCommentError()"
+            aria-describedby="comment-error"
+          ></textarea>
+          @if (showCommentError()) {
+            <p id="comment-error" class="text-sm text-red-700">Veuillez saisir un commentaire (1000 caractères maximum).</p>
+          }
+          @if (sendError()) {
+            <p role="alert" class="text-sm text-red-700">Le commentaire n'a pas pu être envoyé. Veuillez réessayer.</p>
+          }
+        </div>
+        <button
+          type="submit"
+          [disabled]="sending()"
+          aria-label="Envoyer le commentaire"
+          class="mb-1 p-2 text-primary hover:text-primary-dark disabled:opacity-60"
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linejoin="round" d="M3 11.5 21 3l-6.5 18-3.5-7.5L3 11.5Z" />
+            <path stroke-linecap="round" d="M11 13.5 21 3" />
+          </svg>
+        </button>
+      </form>
     </section>
   } @else if (page.status === 'not-found') {
     <div class="mt-8 text-center">
