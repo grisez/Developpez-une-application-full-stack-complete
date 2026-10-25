@@ -45,6 +45,9 @@ public class SecurityConfig {
 	 */
 	private static final String[] PUBLIC_ENDPOINTS = { "/api/auth/register", "/api/auth/login", "/api/auth/logout" };
 
+	/** API documentation, disabled in production by the springdoc properties of the prod profile. */
+	private static final String[] API_DOCUMENTATION = { "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html" };
+
 	/**
 	 * Defines the security rules applied to every HTTP request.
 	 *
@@ -70,6 +73,7 @@ public class SecurityConfig {
 				.authorizeHttpRequests(authorize -> authorize
 						.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
 						.requestMatchers("/error").permitAll()
+						.requestMatchers(HttpMethod.GET, API_DOCUMENTATION).permitAll()
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(oauth2 -> oauth2
 						.bearerTokenResolver(new CookieBearerTokenResolver(Set.of(PUBLIC_ENDPOINTS)))
