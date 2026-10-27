@@ -111,3 +111,22 @@ The token is kept in an HttpOnly cookie rather than in `localStorage`: JavaScrip
 | DTO | `dto/` | The API never exposes JPA entities |
 | Mapper | `mapper/` (MapStruct) | Entity to DTO conversion generated at compile time |
 | Strategy | `CookieBearerTokenResolver`, `PasswordEncoder`, `ProblemDetailSecurityHandler` | Implementations plugged into Spring Security without changing the framework: read the token from a cookie, hash with Argon2id, answer 401 and 403 errors as problem details |
+
+## Testing strategy
+
+| Level | Back-end | Front-end |
+| --- | --- | --- |
+| Unit | Services with JUnit 5 and Mockito, real MapStruct mappers | Components, services, guards, interceptor, directive and validators with Jasmine |
+| Web layer | Controllers and security rules with `@WebMvcTest` and MockMvc | — |
+| Integration | Whole application against a real MySQL started by Testcontainers: authentication, subscriptions, profile, articles, comments, demo data | HTTP calls checked with `HttpTestingController` |
+| End-to-end | Cypress, through the user journey in a real browser | |
+
+Rules followed by every test:
+
+- The name states the expected behaviour, for example `loginRejectsAWrongPassword` or `should log in and open the feed`.
+- Each test follows the Arrange / Act / Assert structure, marked with comments.
+- Tests are isolated: mocks for unit tests, unique data per integration test, a disposable MySQL container.
+- A bug found by a test is fixed together with the test that reproduces it, so that it cannot come back.
+- The CSRF protection is checked with real token cookies: the `jwt()` helper of spring-security-test disables it on the simulated request.
+
+The front-end keeps Karma and Jasmine, the test stack generated and supported by the Angular CLI 20 builder. Jest is only available as an experimental builder in Angular 20; migrating would add risk without a functional gain for this project.
