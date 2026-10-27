@@ -158,6 +158,15 @@ cd front
 npm run test:ci
 ```
 
+## Code quality
+
+| Tool | Command | Result |
+| --- | --- | --- |
+| JaCoCo (back-end coverage) | `cd back && ./mvnw verify` | Report in `back/target/site/jacoco/index.html`; the build fails below 70% of lines covered |
+| Karma coverage (front-end) | `cd front && npm run test:coverage` | Report in `front/coverage/mdd-client/index.html` |
+| ESLint with angular-eslint (front-end) | `cd front && npm run lint` | TypeScript, Angular and template accessibility rules |
+| SonarLint (back-end) | IntelliJ plugin: right-click on `back/src`, then **Analyze with SonarQube for IDE** | Code smells and bugs reported in the IDE |
+
 ## Documentation
 
 | Document | Content |

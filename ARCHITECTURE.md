@@ -130,3 +130,12 @@ Rules followed by every test:
 - The CSRF protection is checked with real token cookies: the `jwt()` helper of spring-security-test disables it on the simulated request.
 
 The front-end keeps Karma and Jasmine, the test stack generated and supported by the Angular CLI 20 builder. Jest is only available as an experimental builder in Angular 20; migrating would add risk without a functional gain for this project.
+
+## Code quality tools
+
+| Tool | What it checks | Impact on maintainability |
+| --- | --- | --- |
+| JaCoCo | Back-end lines and branches covered by the tests; `verify` fails below 70% of lines | A change that removes tests or adds untested code is visible in every build |
+| Karma coverage | Front-end lines and branches covered by the tests | Same visibility on the front-end |
+| ESLint + angular-eslint | TypeScript rules (no `any`, unused code), Angular conventions (selector prefixes, standalone components) and template accessibility (labels, alternative texts, keyboard events) | One style shared by every file, and accessibility mistakes caught before review |
+| SonarLint | Code smells, bugs and security hotspots in the Java code, inside the IDE | Problems are fixed while writing the code, before the pull request |
