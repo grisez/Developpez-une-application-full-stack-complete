@@ -112,6 +112,16 @@ The token is kept in an HttpOnly cookie rather than in `localStorage`: JavaScrip
 | Mapper | `mapper/` (MapStruct) | Entity to DTO conversion generated at compile time |
 | Strategy | `CookieBearerTokenResolver`, `PasswordEncoder`, `ProblemDetailSecurityHandler` | Implementations plugged into Spring Security without changing the framework: read the token from a cookie, hash with Argon2id, answer 401 and 403 errors as problem details |
 
+## SOLID principles
+
+| Principle | Applied in the project |
+| --- | --- |
+| Single responsibility | Controllers handle HTTP, services the business rules, repositories the data access. In the security layer, `JwtService` only issues tokens and `AuthCookieManager` only builds the session cookie. On the front-end, components display and services call the API. |
+| Open/closed | Spring Security is extended by plugging in implementations (`CookieBearerTokenResolver`, `ProblemDetailSecurityHandler`) instead of modifying it. A new error type only needs a new method in `GlobalExceptionHandler`. |
+| Liskov substitution | Each service implementation can replace its interface anywhere: controllers work unchanged with the real service or with a Mockito mock in the tests. |
+| Interface segregation | One small service interface per domain (`AuthService`, `UserService`, `TopicService`, `PostService`, `CommentService`) rather than one large service; repositories only declare the queries they need. |
+| Dependency inversion | Controllers depend on service interfaces, injected through the constructor; services depend on the `PasswordEncoder` and `JwtEncoder` abstractions, not on Argon2 or Nimbus. On the front-end, components receive their services through `inject()`. |
+
 ## Testing strategy
 
 | Level | Back-end | Front-end |

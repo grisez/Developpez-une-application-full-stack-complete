@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 
 import com.openclassrooms.mddapi.model.Post;
 
+/**
+ * Data access to articles.
+ */
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 

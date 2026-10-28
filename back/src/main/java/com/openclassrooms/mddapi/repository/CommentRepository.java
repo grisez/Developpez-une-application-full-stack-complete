@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import com.openclassrooms.mddapi.model.Comment;
 
+/**
+ * Data access to the comments of the articles.
+ */
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 

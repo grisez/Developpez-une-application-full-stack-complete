@@ -186,3 +186,4 @@ npm run e2e
 | --- | --- |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Overview, tech stack, code map and architecture rules |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Branches, ticket lifecycle, pull requests and commit conventions |
+| [TEST-REPORT.md](TEST-REPORT.md) | Test results, coverage and anomalies fixed |

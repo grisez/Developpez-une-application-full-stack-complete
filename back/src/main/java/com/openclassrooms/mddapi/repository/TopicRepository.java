@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 
 import com.openclassrooms.mddapi.model.Topic;
 
+/**
+ * Data access to topics and to the subscriptions of the users.
+ */
 @Repository
 public interface TopicRepository extends JpaRepository<Topic, Integer> {
 
