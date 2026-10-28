@@ -158,6 +158,15 @@ cd front
 npm run test:ci
 ```
 
+The end-to-end tests run with [Cypress](https://www.cypress.io/) against the whole application: start the back-end and the front-end (`npm start`) first, then:
+
+```bash
+cd front
+npm run e2e
+```
+
+`npm run e2e:open` opens the Cypress interface to follow the tests step by step. Each run registers a new account, so the tests can be replayed on the same database.
+
 ## Code quality
 
 | Tool | Command | Result |
