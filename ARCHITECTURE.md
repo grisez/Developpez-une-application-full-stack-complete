@@ -119,7 +119,7 @@ The token is kept in an HttpOnly cookie rather than in `localStorage`: JavaScrip
 | Unit | Services with JUnit 5 and Mockito, real MapStruct mappers | Components, services, guards, interceptor, directive and validators with Jasmine |
 | Web layer | Controllers and security rules with `@WebMvcTest` and MockMvc | — |
 | Integration | Whole application against a real MySQL started by Testcontainers: authentication, subscriptions, profile, articles, comments, demo data | HTTP calls checked with `HttpTestingController` |
-| End-to-end | Cypress, through the user journey in a real browser | |
+| End-to-end | Cypress in a real browser, through the running back-end and front-end: registration, subscription, publication, comment, profile, logout and login, plus the login and registration errors | |
 
 Rules followed by every test:
 
