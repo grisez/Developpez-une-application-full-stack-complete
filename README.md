@@ -1,5 +1,7 @@
 # MDD (Monde de Dév)
 
+[![CI](https://github.com/grisez/Developpez-une-application-full-stack-complete/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/grisez/Developpez-une-application-full-stack-complete/actions/workflows/ci.yml)
+
 A social network for developers: subscribe to topics, read a news feed, write posts and comment on them.
 
 | Part | Technologies | Folder |
@@ -143,6 +145,8 @@ Every endpoint requires the authentication cookie, except register, login and lo
 | `POST` | `/api/articles/{id}/comments` | Comment on an article |
 
 ## Tests
+
+Every pull request and every push to `develop` or `main` runs the [CI workflow](.github/workflows/ci.yml) on GitHub Actions: back-end build and tests with the coverage check, front-end lint, build and tests. The coverage reports are attached to each run as artifacts.
 
 The back-end tests run against a real MySQL database started by [Testcontainers](https://testcontainers.com/). They require Java 21 and a running Docker.
 
