@@ -9,7 +9,9 @@
     "test": "ng test",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadless",
     "test:coverage": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "e2e": "cypress run",
+    "e2e:open": "cypress open"
   },
   "private": true,
   "dependencies": {
@@ -31,6 +33,7 @@
     "@tailwindcss/postcss": "^4.3.3",
     "@types/jasmine": "~5.1.0",
     "angular-eslint": "^20.7.0",
+    "cypress": "^16.2.0",
     "eslint": "^9.39.5",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.4",
