@@ -11,7 +11,8 @@
     "test:coverage": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
     "lint": "ng lint",
     "e2e": "cypress run",
-    "e2e:open": "cypress open"
+    "e2e:open": "cypress open",
+    "screenshots": "cypress run --config-file cypress.screenshots.config.ts"
   },
   "private": true,
   "dependencies": {
