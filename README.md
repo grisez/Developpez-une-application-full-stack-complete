@@ -140,6 +140,92 @@ If your local database was created before Flyway was introduced, reset it once w
 | `dev` | Local development: SQL logged, demo data loaded. Enabled by Docker Compose. |
 | `prod` | Production: reduced logging, API documentation disabled. |
 
+## Deployment
+
+The application is not deployed: this section describes how it would be put into production with Docker Compose on a single server.
+
+### Server prerequisites
+
+- A Linux server (2 vCPU, 2 GB of RAM are enough for the MVP) with Docker Engine and Docker Compose v2
+- A domain name pointing to the server, for the HTTPS certificate
+- A firewall that only lets SSH (22), HTTP (80) and HTTPS (443) in
+
+### Steps
+
+1. Check out the released version: `git clone` the repository, then `git checkout v1.0.0`.
+2. Create `.env` from `.env.example` with new, random secrets (`openssl rand -base64 48`), then restrict it to its owner: `chmod 600 .env`.
+3. Back up the database if it already exists (see the production rules below).
+4. Build and start: `docker compose -f docker-compose.prod.yml up -d --build`.
+5. Check that the services are healthy: `docker compose -f docker-compose.prod.yml ps`, then the logs of the back-end. Flyway applies the new migrations on startup.
+6. Open the application over HTTPS and log in to check the main journey.
+
+### `docker-compose.prod.yml`
+
+The production file is not part of the repository. It would differ from `docker-compose.yml` as follows:
+
+```yaml
+services:
+  db:
+    image: mysql:8.4
+    restart: always
+    env_file: .env
+    # No "ports": the database is only reachable by the back-end, on the internal Docker network
+    volumes:
+      - mdd-db-data:/var/lib/mysql
+    # healthcheck: same as in docker-compose.yml
+
+  back:
+    image: mdd-back:1.0.0            # Versioned image, so that the previous version can be restarted
+    build: ./back
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod   # No demo data, no Swagger, reduced logging, Secure cookie
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    # No "ports": nginx reaches the API through the internal network
+    depends_on:
+      db:
+        condition: service_healthy
+
+  front:
+    image: mdd-front:1.0.0
+    build: ./front
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"                    # nginx terminates HTTPS with a Let's Encrypt certificate
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+
+volumes:
+  mdd-db-data:
+```
+
+The nginx configuration would also redirect HTTP to HTTPS and listen on 443 with the certificate.
+
+### Development and production
+
+| | Development | Production |
+| --- | --- | --- |
+| Compose file | `docker-compose.yml` | `docker-compose.prod.yml` |
+| Spring profile | `dev` | `prod` |
+| Demo data | Loaded | Never loaded |
+| Swagger UI | Enabled | Disabled |
+| Logs | SQL queries displayed | Warnings only |
+| Exposed ports | 4200, 9000, 3306 | 80 and 443 only |
+| HTTPS | No | Yes, required by the `Secure` session cookie |
+| Images | Built locally | Versioned tags (`1.0.0`) |
+| Restart policy | `unless-stopped` | `always` |
+
+### Production rules
+
+- **Secrets**: only in the server's `.env`, never in Git or in the images. Changing `JWT_SECRET` logs every member out, which is the way to revoke all sessions.
+- **Closed ports**: MySQL and the API are never exposed; only nginx is reachable from outside.
+- **Backups**: a daily `mysqldump` of the database, copied to another location, and a restore tested regularly.
+- **Rollback**: restart the previous image tag (`mdd-back:<previous version>`). Flyway migrations only go forward, so a release that changed the schema is rolled back by restoring the backup taken before the deployment.
+
 ## API
 
 The interactive documentation is available outside production at http://localhost:9000/swagger-ui.html, and the OpenAPI description at http://localhost:9000/v3/api-docs. To try a protected endpoint, call `POST /api/auth/login` first: the authentication cookie is then sent with the next requests.
