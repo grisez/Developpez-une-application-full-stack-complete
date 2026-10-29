@@ -12,7 +12,7 @@
       <select
         id="topic"
         formControlName="topicId"
-        class="rounded-md border border-primary bg-white px-3 py-2 focus:outline-2 focus:outline-primary"
+        class="rounded-md border border-primary bg-white px-3 py-2"
         [attr.aria-invalid]="showError('topicId')"
         aria-describedby="topic-error"
       >
@@ -35,7 +35,7 @@
         formControlName="title"
         placeholder="Titre de l'article"
         maxlength="150"
-        class="rounded-md border border-primary px-3 py-2 focus:outline-2 focus:outline-primary"
+        class="rounded-md border border-primary px-3 py-2"
         [attr.aria-invalid]="showError('title')"
         aria-describedby="title-error"
       />
@@ -52,7 +52,7 @@
         placeholder="Contenu de l'article"
         rows="8"
         maxlength="10000"
-        class="rounded-md border border-primary px-3 py-2 focus:outline-2 focus:outline-primary"
+        class="rounded-md border border-primary px-3 py-2"
         [attr.aria-invalid]="showError('content')"
         aria-describedby="content-error"
       ></textarea>
