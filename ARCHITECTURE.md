@@ -122,6 +122,23 @@ The token is kept in an HttpOnly cookie rather than in `localStorage`: JavaScrip
 | Interface segregation | One small service interface per domain (`AuthService`, `UserService`, `TopicService`, `PostService`, `CommentService`) rather than one large service; repositories only declare the queries they need. |
 | Dependency inversion | Controllers depend on service interfaces, injected through the constructor; services depend on the `PasswordEncoder` and `JwtEncoder` abstractions, not on Argon2 or Nimbus. On the front-end, components receive their services through `inject()`. |
 
+## Accessibility
+
+The front-end follows the RGAA (WCAG 2.1 level AA).
+
+| Topic | Applied in the project |
+| --- | --- |
+| Structure | `lang="fr"`, one `h1` per page and a consistent heading hierarchy, `header` / `nav` / `main` landmarks, lists for the feed, topics and comments, `time` for the dates |
+| Page titles | Each route has its own title; an article page is named after the article |
+| Keyboard | Every action is a native `button` or link, reachable with Tab; a skip link "Aller au contenu principal" appears on the first Tab; Escape closes the mobile menu |
+| Focus | One visible focus outline for every element, defined once in `styles.css` |
+| Forms | Each field has a label (visually hidden on the profile page, where the placeholder is the visible label), errors are linked with `aria-describedby`, server errors are announced with `role="alert"` |
+| Images | The logo has an alternative text; decorative icons are hidden with `aria-hidden` |
+| Contrast | At least 4.5:1 for text and placeholders, including white text on the primary color (4.8:1) |
+| Zoom | The layout adapts down to mobile width, so it stays readable at 200% zoom without horizontal scrolling |
+
+ESLint checks the templates with the angular-eslint accessibility rules. The application was also checked manually with the keyboard, at 200% zoom, and with the Lighthouse accessibility audit.
+
 ## Testing strategy
 
 | Level | Back-end | Front-end |
