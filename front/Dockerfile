@@ -1,5 +1,7 @@
 FROM node:22-alpine AS build
 WORKDIR /app
+# The image only serves the built application: the Cypress binary used by the end-to-end tests is not needed
+ENV CYPRESS_INSTALL_BINARY=0
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
