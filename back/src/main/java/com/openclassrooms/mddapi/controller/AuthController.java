@@ -3,8 +3,6 @@ package com.openclassrooms.mddapi.controller;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +13,7 @@ import com.openclassrooms.mddapi.dto.LoginRequest;
 import com.openclassrooms.mddapi.dto.RegisterRequest;
 import com.openclassrooms.mddapi.dto.UserResponse;
 import com.openclassrooms.mddapi.security.AuthCookieManager;
+import com.openclassrooms.mddapi.security.CurrentUserId;
 import com.openclassrooms.mddapi.service.AuthResult;
 import com.openclassrooms.mddapi.service.AuthService;
 import com.openclassrooms.mddapi.service.UserService;
@@ -102,15 +101,15 @@ public class AuthController {
 	 * Returns the logged-in user. The front-end calls it to know whether a session is open,
 	 * since it cannot read the HttpOnly cookie that holds the token.
 	 *
-	 * @param jwt the validated token of the current request
+	 * @param userId the id of the logged-in user
 	 * @return the current user
 	 */
 	@GetMapping("/me")
 	@Operation(summary = "Get the logged-in user", description = "Used by the front-end to restore the session.")
 	@ApiResponse(responseCode = "200", description = "The logged-in user, without password")
 	@ApiResponse(responseCode = "401", description = "No valid session")
-	public UserResponse getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
-		return userService.getById(Long.valueOf(jwt.getSubject()));
+	public UserResponse getCurrentUser(@CurrentUserId Long userId) {
+		return userService.getById(userId);
 	}
 
 }

@@ -1,7 +1,5 @@
 package com.openclassrooms.mddapi.controller;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.openclassrooms.mddapi.dto.ProfileResponse;
 import com.openclassrooms.mddapi.dto.UpdateProfileRequest;
+import com.openclassrooms.mddapi.security.CurrentUserId;
 import com.openclassrooms.mddapi.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,22 +31,22 @@ public class ProfileController {
 	/**
 	 * Returns the profile of the logged-in user, with their subscriptions.
 	 *
-	 * @param jwt the validated token of the current request
+	 * @param userId the id of the logged-in user
 	 * @return the profile
 	 */
 	@GetMapping
 	@Operation(summary = "Get my profile", description = "Email, username and subscriptions; never the password.")
 	@ApiResponse(responseCode = "200", description = "The profile")
 	@ApiResponse(responseCode = "401", description = "No valid session")
-	public ProfileResponse getProfile(@AuthenticationPrincipal Jwt jwt) {
-		return userService.getProfile(Long.valueOf(jwt.getSubject()));
+	public ProfileResponse getProfile(@CurrentUserId Long userId) {
+		return userService.getProfile(userId);
 	}
 
 	/**
 	 * Updates the email, the username and, when given, the password of the logged-in user.
 	 * The session stays valid: the token identifies the user by id, which never changes.
 	 *
-	 * @param jwt     the validated token of the current request
+	 * @param userId  the id of the logged-in user
 	 * @param request the changes
 	 * @return the updated profile
 	 */
@@ -59,9 +58,9 @@ public class ProfileController {
 	@ApiResponse(responseCode = "401", description = "No valid session")
 	@ApiResponse(responseCode = "403", description = "Missing or invalid CSRF token")
 	@ApiResponse(responseCode = "409", description = "Email or username used by another account")
-	public ProfileResponse updateProfile(@AuthenticationPrincipal Jwt jwt,
+	public ProfileResponse updateProfile(@CurrentUserId Long userId,
 			@Valid @RequestBody UpdateProfileRequest request) {
-		return userService.updateProfile(Long.valueOf(jwt.getSubject()), request);
+		return userService.updateProfile(userId, request);
 	}
 
 }

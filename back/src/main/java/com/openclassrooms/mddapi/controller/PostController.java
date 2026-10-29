@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.openclassrooms.mddapi.dto.CreatePostRequest;
 import com.openclassrooms.mddapi.dto.PostDetailResponse;
 import com.openclassrooms.mddapi.dto.PostResponse;
+import com.openclassrooms.mddapi.security.CurrentUserId;
 import com.openclassrooms.mddapi.service.PostService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,8 +41,8 @@ public class PostController {
 	/**
 	 * Returns the news feed of the logged-in user.
 	 *
-	 * @param jwt  the validated token of the current request
-	 * @param sort {@code desc} (default) for the most recent first, {@code asc} for the oldest first
+	 * @param userId the id of the logged-in user
+	 * @param sort   {@code desc} (default) for the most recent first, {@code asc} for the oldest first
 	 * @return the posts of the topics the user is subscribed to
 	 */
 	@GetMapping
@@ -51,10 +50,10 @@ public class PostController {
 	@ApiResponse(responseCode = "200", description = "The articles of the feed")
 	@ApiResponse(responseCode = "400", description = "Unknown sort order")
 	@ApiResponse(responseCode = "401", description = "No valid session")
-	public List<PostResponse> getFeed(@AuthenticationPrincipal Jwt jwt,
+	public List<PostResponse> getFeed(@CurrentUserId Long userId,
 			@Parameter(description = "desc for the most recent first, asc for the oldest first")
 			@RequestParam(defaultValue = "desc") @Pattern(regexp = "asc|desc") String sort) {
-		return postService.getFeed(Long.valueOf(jwt.getSubject()), Sort.Direction.fromString(sort));
+		return postService.getFeed(userId, Sort.Direction.fromString(sort));
 	}
 
 	/**
@@ -75,7 +74,7 @@ public class PostController {
 	/**
 	 * Publishes an article written by the logged-in user.
 	 *
-	 * @param jwt     the validated token of the current request
+	 * @param userId  the id of the logged-in user
 	 * @param request the topic, the title and the content
 	 * @return 201 with the created article and its location
 	 */
@@ -86,9 +85,9 @@ public class PostController {
 	@ApiResponse(responseCode = "401", description = "No valid session")
 	@ApiResponse(responseCode = "403", description = "Missing or invalid CSRF token")
 	@ApiResponse(responseCode = "404", description = "Unknown topic")
-	public ResponseEntity<PostResponse> create(@AuthenticationPrincipal Jwt jwt,
+	public ResponseEntity<PostResponse> create(@CurrentUserId Long userId,
 			@Valid @RequestBody CreatePostRequest request) {
-		PostResponse post = postService.create(Long.valueOf(jwt.getSubject()), request);
+		PostResponse post = postService.create(userId, request);
 		return ResponseEntity.created(URI.create("/api/articles/" + post.id())).body(post);
 	}
 

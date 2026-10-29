@@ -2,8 +2,6 @@ package com.openclassrooms.mddapi.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.openclassrooms.mddapi.dto.CommentResponse;
 import com.openclassrooms.mddapi.dto.CreateCommentRequest;
+import com.openclassrooms.mddapi.security.CurrentUserId;
 import com.openclassrooms.mddapi.service.CommentService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +33,7 @@ public class CommentController {
 	/**
 	 * Adds a comment written by the logged-in user to an article.
 	 *
-	 * @param jwt     the validated token of the current request
+	 * @param userId  the id of the logged-in user
 	 * @param postId  the commented article
 	 * @param request the text of the comment
 	 * @return 201 with the created comment
@@ -46,9 +45,9 @@ public class CommentController {
 	@ApiResponse(responseCode = "401", description = "No valid session")
 	@ApiResponse(responseCode = "403", description = "Missing or invalid CSRF token")
 	@ApiResponse(responseCode = "404", description = "Unknown article")
-	public ResponseEntity<CommentResponse> create(@AuthenticationPrincipal Jwt jwt, @PathVariable Long postId,
+	public ResponseEntity<CommentResponse> create(@CurrentUserId Long userId, @PathVariable Long postId,
 			@Valid @RequestBody CreateCommentRequest request) {
-		CommentResponse comment = commentService.create(postId, Long.valueOf(jwt.getSubject()), request);
+		CommentResponse comment = commentService.create(postId, userId, request);
 		// No Location header: a comment is only read with its article, it has no page of its own
 		return ResponseEntity.status(HttpStatus.CREATED).body(comment);
 	}
