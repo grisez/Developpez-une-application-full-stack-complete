@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, input, numberAttribute, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { Observable, catchError, map, of, startWith, switchMap, tap, throwError } from 'rxjs';
 
@@ -24,6 +25,8 @@ type PageState = { status: 'loading' } | { status: 'loaded'; post: PostDetailMod
 })
 export class PostDetail {
   private readonly postService = inject(PostService);
+
+  private readonly title = inject(Title);
 
   /** Article id taken from the URL, bound by the router (withComponentInputBinding). */
   readonly id = input.required({ transform: numberAttribute });
@@ -79,7 +82,11 @@ export class PostDetail {
 
   private load(id: number): Observable<PageState> {
     return this.postService.getById(id).pipe(
-      tap(() => this.addedComments.set([])),
+      tap((post) => {
+        this.addedComments.set([]);
+        // The route title only says "Article": each article page gets its own title (RGAA 8.6)
+        this.title.setTitle(`${post.title} - MDD`);
+      }),
       map((post): PageState => ({ status: 'loaded', post })),
       catchError((error: unknown) =>
         // A missing article is expected and shown on the page; other errors are reported by the interceptor
