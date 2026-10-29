@@ -10,6 +10,24 @@ A social network for developers: subscribe to topics, read a news feed, write po
 | Back-end | Spring Boot 3.5, Java 21, Spring Data JPA | `back/` |
 | Database | MySQL 8.4 | Docker container |
 
+## Project structure
+
+```text
+.
+├── back/                  Spring Boot API
+│   └── src/main/java/…    controller, service, repository, model, dto, mapper, security, exception, …
+├── front/                 Angular application
+│   ├── src/app/core/      services, guards, interceptor, models
+│   ├── src/app/features/  one folder per page
+│   ├── src/app/shared/    reusable components, directive, validators
+│   └── cypress/           end-to-end tests
+├── .github/workflows/     CI on GitHub Actions
+├── docker-compose.yml     MySQL, back-end and front-end
+└── .env.example           template of the environment variables
+```
+
+The detailed code map and the architecture rules are in [ARCHITECTURE.md](ARCHITECTURE.md).
+
 ## Running with Docker
 
 ### Prerequisites
@@ -188,3 +206,4 @@ npm run e2e
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Branches, ticket lifecycle, pull requests and commit conventions |
 | [TEST-REPORT.md](TEST-REPORT.md) | Test results, coverage and anomalies fixed |
 | [COMPLIANCE.md](COMPLIANCE.md) | Legal notice, privacy policy, cookies and security of the logs |
+| [FAQ.md](FAQ.md) | User FAQ, in French like the application: account, topics, articles, profile, common errors |
