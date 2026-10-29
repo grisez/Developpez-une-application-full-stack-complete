@@ -12,11 +12,12 @@
     "lint": "ng lint",
     "e2e": "cypress run",
     "e2e:open": "cypress open",
-    "screenshots": "cypress run --config-file cypress.screenshots.config.ts"
+    "screenshots": "cypress run --config-file cypress.screenshots.config.ts",
+    "format": "prettier --write \"src/**/*.{ts,html,css}\" \"cypress/**/*.ts\" \"cypress*.config.ts\"",
+    "format:check": "prettier --check \"src/**/*.{ts,html,css}\" \"cypress/**/*.ts\" \"cypress*.config.ts\""
   },
   "private": true,
   "dependencies": {
-    "@angular/cdk": "^20.2.14",
     "@angular/common": "^20.3.34",
     "@angular/compiler": "^20.3.34",
     "@angular/core": "^20.3.34",
@@ -43,6 +44,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "postcss": "^8.5.6",
+    "prettier": "3.9.9",
     "tailwindcss": "^4.3.3",
     "typescript": "~5.9.0",
     "typescript-eslint": "^8.72.1"

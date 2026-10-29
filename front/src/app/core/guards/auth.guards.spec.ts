@@ -1,6 +1,13 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, GuardResult, MaybeAsync, RouterStateSnapshot, UrlTree, provideRouter } from '@angular/router';
+import {
+  ActivatedRouteSnapshot,
+  GuardResult,
+  MaybeAsync,
+  RouterStateSnapshot,
+  UrlTree,
+  provideRouter,
+} from '@angular/router';
 
 import { AuthService } from '../services/auth.service';
 import { authGuard, guestGuard } from './auth.guards';
@@ -15,9 +22,7 @@ describe('auth guards', () => {
   });
 
   function run(guard: typeof authGuard): MaybeAsync<GuardResult> {
-    return TestBed.runInInjectionContext(() =>
-      guard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot),
-    );
+    return TestBed.runInInjectionContext(() => guard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot));
   }
 
   function redirection(result: MaybeAsync<GuardResult>): string {
