@@ -6,8 +6,8 @@ State of the tests of the MVP. The strategy and the rules followed by the tests 
 
 | Suite | Tool | Tests | Result |
 | --- | --- | --- | --- |
-| Back-end: unit, web layer and integration | JUnit 5, Mockito, MockMvc, Testcontainers | 100 | All passing |
-| Front-end: unit | Karma, Jasmine | 73 | All passing |
+| Back-end: unit, web layer and integration | JUnit 5, Mockito, MockMvc, Testcontainers | 110 | All passing |
+| Front-end: unit | Karma, Jasmine | 82 | All passing |
 | End-to-end | Cypress | 3 | All passing |
 
 Every pull request runs the back-end and front-end suites on GitHub Actions, and a failure blocks the merge into `develop`. The end-to-end tests run locally against the whole application (see [README.md](README.md#tests)).
@@ -52,6 +52,27 @@ Each anomaly was fixed together with a test that reproduces it, so that it canno
 - **Cause**: Bean Validation checked the raw value, and the spaces were removed afterwards.
 - **Fix**: the request records trim their fields in their compact constructor, before validation; the front-end trims the text fields as they are typed (`appTrim` directive). The password is kept as typed.
 - **Tests**: `AuthRequestsTest`, `trim.directive.spec.ts`.
+
+## Static analysis and code review
+
+| Analysis | Result | Action |
+| --- | --- | --- |
+| ESLint with angular-eslint (front-end) | No error | Run by the CI on every pull request |
+| Prettier (front-end formatting) | 13 files reformatted when it was added | `format:check` run by the CI on every pull request |
+| PMD (back-end: unused code, bad practices) | No issue | — |
+| CPD (back-end: duplicated code) | One block: the `content`, `createdAt` and `author` columns shared by `Post` and `Comment` | Kept: two distinct tables, a common parent entity would couple them for three fields |
+| Lighthouse accessibility | 98 on the feed, article, topics and profile pages | Before: focus hard to see, pale placeholders, generic page titles, no skip link; all fixed |
+| Full code review before the release | No critical issue; the points below fixed | See below |
+
+Fixed after the code review:
+
+- **Pages stuck on "loading" after a server error**: the feed, article, article creation, topics and profile pages now display a message with a "Réessayer" button. Tests: one per page, for example `feed.spec.ts` "should offer to retry when the feed cannot be loaded".
+- **No security headers on the front-end**: nginx now sends a Content Security Policy, `X-Content-Type-Options`, `Referrer-Policy`, compresses the files and caches the hashed bundles.
+- **Password rule tested with one case only on the back-end**: `ValidPasswordTest` checks each rule and the 8 and 64 character limits.
+- **Duplicated code**: the id of the logged-in user is injected by `@CurrentUserId` instead of being parsed in nine places; the 404 and 409 errors are grouped in two exception families handled once.
+- **Smaller fixes**: an article made of spaces only is refused by the front-end, the error banner is cleared when the user changes page, unused dependency (Angular CDK) removed, documentation aligned with the code.
+
+The points kept for later are listed in [ARCHITECTURE.md](ARCHITECTURE.md#limits-and-improvement-axes).
 
 ## Known limits
 

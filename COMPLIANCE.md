@@ -47,9 +47,11 @@ Both cookies are strictly necessary for the service. The application uses no tra
 - No password, token or personal data is written to the logs.
 - The two messages logged by the back-end are generic: a rejected data conflict, logged without the conflicting value, and an unexpected error.
 - In development, the SQL queries displayed show `?` placeholders, never the values.
-- In production, only warnings are logged (`application-prod.properties`).
+- In production, the libraries only log warnings and errors; the application keeps its own startup messages (`application-prod.properties`).
 
 ## Improvement axes
 
 - Display the legal notice and the privacy policy as pages of the application, linked from a footer on every page.
 - Let members delete their account themselves from the profile page.
+
+The other improvement axes of the project are listed in [ARCHITECTURE.md](ARCHITECTURE.md#limits-and-improvement-axes).

@@ -30,16 +30,16 @@ flowchart LR
 
 | Area | Tools |
 | --- | --- |
-| Front-end | Angular 20 (standalone components, esbuild builder), TypeScript 5.9, Angular CLI, RxJS, Signals, Tailwind CSS 4, Angular CDK (accessibility) |
+| Front-end | Angular 20 (standalone components, esbuild builder), TypeScript 5.9, Angular CLI, RxJS, Signals, Tailwind CSS 4 |
 | Back-end | Java 21, Spring Boot 3.5 (Web, Data JPA, Security, Validation), Lombok, Maven |
 | Database | MySQL 8.4, Flyway |
 | Security | JWT (Spring Security OAuth2 Resource Server), Argon2id password hashing |
 | API documentation | springdoc-openapi (Swagger UI) |
 | Tests | JUnit 5, Mockito, Spring Boot Test, Karma and Jasmine, Cypress |
-| Code quality | ESLint, Prettier, SonarQube, JaCoCo (back-end coverage) |
+| Code quality | ESLint with angular-eslint, Prettier, JaCoCo (back-end coverage), SonarQube for IDE (formerly SonarLint) in IntelliJ |
 | Infrastructure | Docker, Docker Compose, nginx |
 | CI and project management | GitHub Actions, GitHub Projects |
-| API testing | Postman |
+| API testing | Swagger UI, MockMvc and Testcontainers tests |
 
 ## Code map
 
@@ -47,7 +47,7 @@ flowchart LR
 
 ```
 src/main/java/com/openclassrooms/mddapi/
-├── config/        cross-cutting configuration (CORS, OpenAPI)
+├── config/        cross-cutting configuration (OpenAPI)
 ├── controller/    REST controllers: HTTP layer, input validation, DTOs in and out
 ├── dto/           request and response objects exchanged with the front-end
 ├── exception/     business exceptions and the global error handler
@@ -72,7 +72,7 @@ A request goes through: JWT filter → controller → service → repository →
 src/app/
 ├── core/        app-wide services, HTTP interceptor, route guards, models
 ├── features/    one folder per feature: auth, feed, topics, posts, profile
-└── shared/      reusable UI components
+└── shared/      reusable UI components, trim directive, form validators, loading state of the pages (utils/)
 ```
 
 Files follow the Angular 20 naming convention: a component lives in `name.ts` with its template in `name.html` (class `Name`). Services keep the `.service.ts` suffix so they never clash with the model of the same name. Routes are lazy loaded.
@@ -92,6 +92,7 @@ The token is kept in an HttpOnly cookie rather than in `localStorage`: JavaScrip
 ## Architecture rules
 
 - Controllers only return DTOs, never JPA entities.
+- The logged-in user is always read from the signed token (`@CurrentUserId`), never from the request.
 - Business rules live in services, never in controllers.
 - Every route requires a JWT, except `/api/auth/register`, `/api/auth/login` and `/api/auth/logout`. These three ignore the token cookie, so that an invalid token never prevents a user from logging in or out.
 - The JWT travels in an HttpOnly cookie that JavaScript cannot read. Every state-changing request must carry the CSRF token: Angular copies the `XSRF-TOKEN` cookie into the `X-XSRF-TOKEN` header.
@@ -117,10 +118,10 @@ The token is kept in an HttpOnly cookie rather than in `localStorage`: JavaScrip
 | Principle | Applied in the project |
 | --- | --- |
 | Single responsibility | Controllers handle HTTP, services the business rules, repositories the data access. In the security layer, `JwtService` only issues tokens and `AuthCookieManager` only builds the session cookie. On the front-end, components display and services call the API. |
-| Open/closed | Spring Security is extended by plugging in implementations (`CookieBearerTokenResolver`, `ProblemDetailSecurityHandler`) instead of modifying it. A new error type only needs a new method in `GlobalExceptionHandler`. |
+| Open/closed | Spring Security is extended by plugging in implementations (`CookieBearerTokenResolver`, `ProblemDetailSecurityHandler`) instead of modifying it. Errors are grouped by family (`ResourceNotFoundException`, `FieldAlreadyUsedException`), each answered by one handler: a new kind of missing resource or of duplicate value needs no change in `GlobalExceptionHandler`. |
 | Liskov substitution | Each service implementation can replace its interface anywhere: controllers work unchanged with the real service or with a Mockito mock in the tests. |
 | Interface segregation | One small service interface per domain (`AuthService`, `UserService`, `TopicService`, `PostService`, `CommentService`) rather than one large service; repositories only declare the queries they need. |
-| Dependency inversion | Controllers depend on service interfaces, injected through the constructor; services depend on the `PasswordEncoder` and `JwtEncoder` abstractions, not on Argon2 or Nimbus. On the front-end, components receive their services through `inject()`. |
+| Dependency inversion | Controllers depend on service interfaces, injected through the constructor. `AuthServiceImpl` depends on the `PasswordEncoder` abstraction, not on Argon2, and `JwtService` on the `JwtEncoder` abstraction, not on Nimbus. On the front-end, components receive their services through `inject()`. |
 
 ## Accessibility
 
@@ -165,4 +166,22 @@ The front-end keeps Karma and Jasmine, the test stack generated and supported by
 | JaCoCo | Back-end lines and branches covered by the tests; `verify` fails below 70% of lines | A change that removes tests or adds untested code is visible in every build |
 | Karma coverage | Front-end lines and branches covered by the tests | Same visibility on the front-end |
 | ESLint + angular-eslint | TypeScript rules (no `any`, unused code), Angular conventions (selector prefixes, standalone components) and template accessibility (labels, alternative texts, keyboard events) | One style shared by every file, and accessibility mistakes caught before review |
-| SonarLint | Code smells, bugs and security hotspots in the Java code, inside the IDE | Problems are fixed while writing the code, before the pull request |
+| Prettier | Formatting of the TypeScript, HTML templates and CSS of the front-end (indentation, quotes, line length); checked by the CI | No formatting debate in reviews, and diffs that only show real changes |
+| SonarQube for IDE (formerly SonarLint) | Code smells, bugs and security hotspots in the Java code, inside the IDE | Problems are fixed while writing the code, before the pull request |
+
+The results of these tools, and what was fixed after them, are listed in [TEST-REPORT.md](TEST-REPORT.md#static-analysis-and-code-review).
+
+## Limits and improvement axes
+
+The MVP covers the functional specifications. These improvements would bring it to a production level, by priority:
+
+| Area | Current limit | Improvement |
+| --- | --- | --- |
+| Security | Email and password can be changed without typing the current password | Ask for the current password before any sensitive change |
+| Security | A token stays valid until it expires (7 days), even after logout | Short-lived access token with a refresh token, and a revocation list checked on each request |
+| Security | Unlimited login attempts; response times can reveal whether an account exists | Rate limiting and temporary lockout after repeated failures; constant-time login path |
+| Performance | The feed returns every article, with its full content | Pagination (`Slice` and infinite scroll) and an excerpt of the content in the list |
+| Compliance | Legal notice and privacy policy are documents of the repository; account deletion is done on request | Pages in the application, linked from a footer; self-service account deletion from the profile |
+| Ergonomics | After logging in from a protected link, the user lands on the feed; comment dates are not displayed | Return to the requested page after login; display the date of each comment |
+| Quality | End-to-end tests run locally only | Run them in the CI against the Docker Compose stack |
+| Deployment | The application is not deployed | Production stack described in the README (HTTPS, closed ports, backups), to apply on a server |

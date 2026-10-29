@@ -6,7 +6,7 @@ A social network for developers: subscribe to topics, read a news feed, write po
 
 | Part | Technologies | Folder |
 | --- | --- | --- |
-| Front-end | Angular 20, TypeScript, Tailwind CSS 4, Angular CDK | `front/` |
+| Front-end | Angular 20, TypeScript, Tailwind CSS 4 | `front/` |
 | Back-end | Spring Boot 3.5, Java 21, Spring Data JPA | `back/` |
 | Database | MySQL 8.4 | Docker container |
 
@@ -19,7 +19,7 @@ A social network for developers: subscribe to topics, read a news feed, write po
 ├── front/                 Angular application
 │   ├── src/app/core/      services, guards, interceptor, models
 │   ├── src/app/features/  one folder per page
-│   ├── src/app/shared/    reusable components, directive, validators
+│   ├── src/app/shared/    reusable components, directive, validators, utils
 │   └── cypress/           end-to-end tests
 ├── .github/workflows/     CI on GitHub Actions
 ├── docker-compose.yml     MySQL, back-end and front-end
@@ -213,7 +213,7 @@ The nginx configuration would also redirect HTTP to HTTPS and listen on 443 with
 | Spring profile | `dev` | `prod` |
 | Demo data | Loaded | Never loaded |
 | Swagger UI | Enabled | Disabled |
-| Logs | SQL queries displayed | Warnings only |
+| Logs | SQL queries displayed | Warnings and errors, plus the startup messages of the application |
 | Exposed ports | 4200, 9000, 3306 | 80 and 443 only |
 | HTTPS | No | Yes, required by the `Secure` session cookie |
 | Images | Built locally | Versioned tags (`1.0.0`) |
@@ -289,7 +289,8 @@ npm run screenshots
 | JaCoCo (back-end coverage) | `cd back && ./mvnw verify` | Report in `back/target/site/jacoco/index.html`; the build fails below 70% of lines covered |
 | Karma coverage (front-end) | `cd front && npm run test:coverage` | Report in `front/coverage/mdd-client/index.html` |
 | ESLint with angular-eslint (front-end) | `cd front && npm run lint` | TypeScript, Angular and template accessibility rules |
-| SonarLint (back-end) | IntelliJ plugin: right-click on `back/src`, then **Analyze with SonarQube for IDE** | Code smells and bugs reported in the IDE |
+| Prettier (front-end) | `cd front && npm run format` (`format:check` in the CI) | Code formatted the same way in every file |
+| SonarQube for IDE, formerly SonarLint (back-end) | IntelliJ plugin: right-click on `back/src`, then **Analyze with SonarQube for IDE** | Code smells and bugs reported in the IDE |
 
 ## Documentation
 
