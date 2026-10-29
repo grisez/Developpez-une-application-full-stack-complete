@@ -275,6 +275,13 @@ npm run e2e
 
 `npm run e2e:open` opens the Cypress interface to follow the tests step by step. Each run registers a new account, so the tests can be replayed on the same database.
 
+The screenshots of the [UI/UX annex](UI-UX.md) are generated the same way, on desktop and mobile, into `docs/screenshots/`. The back-end must run with the `dev` profile, as they use the demo account `alice`:
+
+```bash
+cd front
+npm run screenshots
+```
+
 ## Code quality
 
 | Tool | Command | Result |
@@ -293,3 +300,4 @@ npm run e2e
 | [TEST-REPORT.md](TEST-REPORT.md) | Test results, coverage and anomalies fixed |
 | [COMPLIANCE.md](COMPLIANCE.md) | Legal notice, privacy policy, cookies and security of the logs |
 | [FAQ.md](FAQ.md) | User FAQ, in French like the application: account, topics, articles, profile, common errors |
+| [UI-UX.md](UI-UX.md) | Screen-by-screen analysis with screenshots, user journeys, responsive and accessibility choices; screenshots regenerated with `npm run screenshots` |
