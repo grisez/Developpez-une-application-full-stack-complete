@@ -11,18 +11,18 @@ import { CreatePost } from './create-post';
 
 describe('CreatePost', () => {
   let postService: jasmine.SpyObj<PostService>;
+  let topicService: jasmine.SpyObj<TopicService>;
 
   beforeEach(() => {
     postService = jasmine.createSpyObj<PostService>('PostService', ['create']);
+    topicService = jasmine.createSpyObj<TopicService>('TopicService', ['getTopics']);
+    topicService.getTopics.and.returnValue(of([{ id: 2, name: 'Java', description: 'JVM', subscribed: false }]));
     TestBed.configureTestingModule({
       imports: [CreatePost],
       providers: [
         provideRouter([]),
         { provide: PostService, useValue: postService },
-        {
-          provide: TopicService,
-          useValue: { getTopics: () => of([{ id: 2, name: 'Java', description: 'JVM', subscribed: false }]) },
-        },
+        { provide: TopicService, useValue: topicService },
         { provide: AuthService, useValue: { isLoggedIn: signal(true) } },
       ],
     });
@@ -38,7 +38,10 @@ describe('CreatePost', () => {
     const select = element.querySelector<HTMLSelectElement>('#topic')!;
     select.selectedIndex = 1;
     select.dispatchEvent(new Event('change'));
-    for (const [id, value] of [['title', 'Hello'], ['content', 'First post']]) {
+    for (const [id, value] of [
+      ['title', 'Hello'],
+      ['content', 'First post'],
+    ]) {
       const field = element.querySelector<HTMLInputElement | HTMLTextAreaElement>(`#${id}`)!;
       field.value = value;
       field.dispatchEvent(new Event('input'));
@@ -65,12 +68,52 @@ describe('CreatePost', () => {
     expect(element.querySelector('#content-error')).not.toBeNull();
   });
 
+  it('should refuse a content made of spaces only', () => {
+    // Arrange
+    const { fixture, element } = render();
+    fill(fixture, element);
+    const content = element.querySelector<HTMLTextAreaElement>('#content')!;
+    content.value = '   ';
+    content.dispatchEvent(new Event('input'));
+
+    // Act
+    submit(fixture, element);
+
+    // Assert
+    expect(postService.create).not.toHaveBeenCalled();
+    expect(element.querySelector('#content-error')).not.toBeNull();
+  });
+
+  it('should offer to retry when the topics cannot be loaded, then display the form', () => {
+    // Arrange
+    topicService.getTopics.and.returnValues(
+      throwError(() => new HttpErrorResponse({ status: 500 })),
+      of([{ id: 2, name: 'Java', description: 'JVM', subscribed: false }]),
+    );
+    const { fixture, element } = render();
+    expect(element.querySelector('form')).toBeNull();
+
+    // Act
+    element.querySelector<HTMLButtonElement>('[role="alert"] button')!.click();
+    fixture.detectChanges();
+
+    // Assert
+    expect(element.querySelectorAll('#topic option').length).toBe(2);
+  });
+
   it('should publish the article and go back to the feed', () => {
     // Arrange
-    postService.create.and.returnValue(of({
-      id: 5, title: 'Hello', content: 'First post', createdAt: '2026-10-23T10:00:00Z',
-      authorUsername: 'alice', topicId: 2, topicName: 'Java',
-    }));
+    postService.create.and.returnValue(
+      of({
+        id: 5,
+        title: 'Hello',
+        content: 'First post',
+        createdAt: '2026-10-23T10:00:00Z',
+        authorUsername: 'alice',
+        topicId: 2,
+        topicName: 'Java',
+      }),
+    );
     const navigate = spyOn(TestBed.inject(Router), 'navigateByUrl');
     const { fixture, element } = render();
     fill(fixture, element);

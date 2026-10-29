@@ -21,7 +21,9 @@
     </button>
   </div>
 
-  @if (posts(); as posts) {
+  @let state = posts();
+  @if (state.status === 'loaded') {
+    @let posts = state.value;
     @if (posts.length > 0) {
       <ul class="mt-6 grid gap-4 md:grid-cols-2">
         @for (post of posts; track post.id) {
@@ -47,6 +49,8 @@
         pour y voir leurs articles.
       </p>
     }
+  } @else if (state.status === 'error') {
+    <app-load-error message="Les articles n'ont pas pu être chargés." (retry)="retry()" />
   } @else {
     <p role="status" class="mt-6 text-center">Chargement des articles…</p>
   }

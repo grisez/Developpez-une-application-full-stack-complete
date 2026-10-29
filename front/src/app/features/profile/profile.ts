@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -10,13 +10,11 @@ import { AuthService } from '../../core/services/auth.service';
 import { ProfileService } from '../../core/services/profile.service';
 import { TopicService } from '../../core/services/topic.service';
 import { Header } from '../../shared/components/header/header';
+import { LoadError } from '../../shared/components/load-error/load-error';
 import { TopicCard } from '../../shared/components/topic-card/topic-card';
 import { TrimDirective } from '../../shared/directives/trim.directive';
-import {
-  accountErrorMessage,
-  emailValidators,
-  usernameValidators,
-} from '../../shared/validators/account.validators';
+import { accountErrorMessage, emailValidators, usernameValidators } from '../../shared/validators/account.validators';
+import { LoadState, toLoadState } from '../../shared/utils/load-state';
 import { passwordValidator } from '../../shared/validators/password.validator';
 
 /**
@@ -24,7 +22,7 @@ import { passwordValidator } from '../../shared/validators/password.validator';
  */
 @Component({
   selector: 'app-profile',
-  imports: [Header, TopicCard, RouterLink, ReactiveFormsModule, TrimDirective],
+  imports: [Header, TopicCard, LoadError, RouterLink, ReactiveFormsModule, TrimDirective],
   templateUrl: './profile.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -32,9 +30,9 @@ export class Profile {
   private readonly profileService = inject(ProfileService);
   private readonly authService = inject(AuthService);
   private readonly topicService = inject(TopicService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  /** Undefined while loading; an error is reported by the error interceptor. */
-  protected readonly profile = signal<ProfileModel | undefined>(undefined);
+  protected readonly profile = signal<LoadState<ProfileModel>>({ status: 'loading' });
 
   /** The password is left empty: it is only stored as a one-way hash, and an empty value keeps it unchanged. */
   protected readonly form = inject(NonNullableFormBuilder).group({
@@ -51,10 +49,15 @@ export class Profile {
   protected readonly unsubscribing = signal<ReadonlySet<number>>(new Set());
 
   constructor() {
+    this.load();
+  }
+
+  /** Loads the profile; also called by the retry button after an error. */
+  protected load(): void {
     this.profileService
       .getProfile()
-      .pipe(takeUntilDestroyed())
-      .subscribe((profile) => this.showProfile(profile));
+      .pipe(toLoadState(), takeUntilDestroyed(this.destroyRef))
+      .subscribe((state) => (state.status === 'loaded' ? this.showProfile(state.value) : this.profile.set(state)));
   }
 
   protected save(): void {
@@ -83,9 +86,16 @@ export class Profile {
     this.unsubscribing.update((ids) => new Set(ids).add(topic.id));
     this.topicService.unsubscribe(topic.id).subscribe({
       next: () => {
-        this.profile.update(
-          (profile) =>
-            profile && { ...profile, subscriptions: profile.subscriptions.filter((current) => current.id !== topic.id) },
+        this.profile.update((state) =>
+          state.status === 'loaded'
+            ? {
+                ...state,
+                value: {
+                  ...state.value,
+                  subscriptions: state.value.subscriptions.filter((current) => current.id !== topic.id),
+                },
+              }
+            : state,
         );
         this.stopUnsubscribing(topic.id);
       },
@@ -108,7 +118,7 @@ export class Profile {
   }
 
   private showProfile(profile: ProfileModel): void {
-    this.profile.set(profile);
+    this.profile.set({ status: 'loaded', value: profile });
     this.form.reset({ username: profile.username, email: profile.email, password: '' });
   }
 }

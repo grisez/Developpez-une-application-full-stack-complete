@@ -5,7 +5,7 @@ import { LOCALE_ID, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, defer, of, throwError } from 'rxjs';
 
 import { PostDetail as PostDetailModel } from '../../../core/models/post';
 import { AuthService } from '../../../core/services/auth.service';
@@ -114,5 +114,23 @@ describe('PostDetail', () => {
     // Assert
     expect(element.querySelector('h1')?.textContent).toContain('Article introuvable');
     expect(element.querySelector('main a[href="/feed"]')).not.toBeNull();
+  });
+
+  it('should offer to retry when the article cannot be loaded, then display it', () => {
+    // Arrange: the first request fails, the next one succeeds
+    let requests = 0;
+    const response = defer(() =>
+      ++requests === 1 ? throwError(() => new HttpErrorResponse({ status: 500 })) : of(article),
+    );
+    const element = render(response);
+    expect(element.querySelector('[role="alert"]')?.textContent).toContain("L'article n'a pas pu être chargé.");
+
+    // Act
+    element.querySelector<HTMLButtonElement>('[role="alert"] button')!.click();
+    fixture.detectChanges();
+
+    // Assert
+    expect(requests).toBe(2);
+    expect(element.querySelector('h1')?.textContent).toContain('Hello MDD');
   });
 });

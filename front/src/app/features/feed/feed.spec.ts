@@ -1,9 +1,10 @@
 import { registerLocaleData } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import localeFr from '@angular/common/locales/fr';
 import { LOCALE_ID, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { Post } from '../../core/models/post';
 import { AuthService } from '../../core/services/auth.service';
@@ -65,7 +66,6 @@ describe('Feed', () => {
 
     // Act
     element.querySelector<HTMLButtonElement>('main button')!.click();
-    expect(element.querySelector('main a[href="/articles/new"]')).not.toBeNull();
     fixture.detectChanges();
 
     // Assert
@@ -82,5 +82,24 @@ describe('Feed', () => {
 
     // Assert
     expect(element.querySelector('main a[href="/topics"]')).not.toBeNull();
+  });
+
+  it('should offer to retry when the feed cannot be loaded, then display it', () => {
+    // Arrange
+    postService.getFeed.and.returnValues(
+      throwError(() => new HttpErrorResponse({ status: 500 })),
+      of([post]),
+    );
+    const { fixture, element } = render();
+    expect(element.querySelector('[role="alert"]')?.textContent).toContain("Les articles n'ont pas pu être chargés.");
+
+    // Act
+    element.querySelector<HTMLButtonElement>('[role="alert"] button')!.click();
+    fixture.detectChanges();
+
+    // Assert
+    expect(postService.getFeed).toHaveBeenCalledTimes(2);
+    expect(element.querySelector('[role="alert"]')).toBeNull();
+    expect(element.querySelector('main li h2')?.textContent).toContain('Hello MDD');
   });
 });
