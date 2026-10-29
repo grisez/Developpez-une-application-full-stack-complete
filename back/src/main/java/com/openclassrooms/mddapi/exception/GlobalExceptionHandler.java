@@ -42,36 +42,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	/**
-	 * Handles a request about a user that does not exist.
+	 * Handles a request about a resource that does not exist, whatever its kind (user, topic, article).
 	 *
-	 * @param exception the missing user error
+	 * @param exception the missing resource error
 	 * @return a 404 problem detail
 	 */
-	@ExceptionHandler(UserNotFoundException.class)
-	public ProblemDetail handleUserNotFound(UserNotFoundException exception) {
-		return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "User not found.");
-	}
-
-	/**
-	 * Handles a request about a topic that does not exist.
-	 *
-	 * @param exception the missing topic error
-	 * @return a 404 problem detail
-	 */
-	@ExceptionHandler(TopicNotFoundException.class)
-	public ProblemDetail handleTopicNotFound(TopicNotFoundException exception) {
-		return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "Topic not found.");
-	}
-
-	/**
-	 * Handles a request about an article that does not exist.
-	 *
-	 * @param exception the missing article error
-	 * @return a 404 problem detail
-	 */
-	@ExceptionHandler(PostNotFoundException.class)
-	public ProblemDetail handlePostNotFound(PostNotFoundException exception) {
-		return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "Article not found.");
+	@ExceptionHandler(ResourceNotFoundException.class)
+	public ProblemDetail handleResourceNotFound(ResourceNotFoundException exception) {
+		return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getPublicMessage());
 	}
 
 	/**
@@ -86,25 +64,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	/**
-	 * Handles an email that another account already uses.
+	 * Handles a unique value, such as an email address or a username, that another account already uses.
 	 *
 	 * @param exception the duplicate error
 	 * @return a 409 problem detail naming the field, in the same {@code errors} format as validation errors
 	 */
-	@ExceptionHandler(EmailAlreadyUsedException.class)
-	public ProblemDetail handleEmailAlreadyUsed(EmailAlreadyUsedException exception) {
-		return conflictOnField("email", exception.getMessage());
-	}
-
-	/**
-	 * Handles a username that another account already uses.
-	 *
-	 * @param exception the duplicate error
-	 * @return a 409 problem detail naming the field, in the same {@code errors} format as validation errors
-	 */
-	@ExceptionHandler(UsernameAlreadyUsedException.class)
-	public ProblemDetail handleUsernameAlreadyUsed(UsernameAlreadyUsedException exception) {
-		return conflictOnField("username", exception.getMessage());
+	@ExceptionHandler(FieldAlreadyUsedException.class)
+	public ProblemDetail handleFieldAlreadyUsed(FieldAlreadyUsedException exception) {
+		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
+		problem.setProperty("errors", Map.of(exception.getField(), exception.getMessage()));
+		return problem;
 	}
 
 	/**
@@ -131,12 +100,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	public ProblemDetail handleUnexpected(Exception exception) {
 		log.error("Unexpected error", exception);
 		return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred.");
-	}
-
-	private static ProblemDetail conflictOnField(String field, String message) {
-		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, message);
-		problem.setProperty("errors", Map.of(field, message));
-		return problem;
 	}
 
 }

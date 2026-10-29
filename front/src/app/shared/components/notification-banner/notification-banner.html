@@ -2,7 +2,12 @@
   @if (notifications.message(); as message) {
     <div role="alert" class="flex items-center justify-between gap-4 bg-red-700 px-4 py-2 text-sm text-white">
       <p>{{ message }}</p>
-      <button type="button" (click)="notifications.clear()" aria-label="Fermer le message" class="text-lg leading-none focus-visible:outline-white">
+      <button
+        type="button"
+        (click)="notifications.clear()"
+        aria-label="Fermer le message"
+        class="text-lg leading-none focus-visible:outline-white"
+      >
         &times;
       </button>
     </div>

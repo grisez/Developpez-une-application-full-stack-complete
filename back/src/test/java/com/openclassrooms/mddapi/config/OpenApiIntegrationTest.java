@@ -37,7 +37,9 @@ class OpenApiIntegrationTest {
 				.andExpect(jsonPath("$.components.securitySchemes.cookieAuth.name").value("mdd_token"))
 				.andExpect(jsonPath("$.paths['/api/auth/login'].post.security").isEmpty())
 				.andExpect(jsonPath("$.paths['/api/me'].get.responses", hasKey("401")))
-				.andExpect(jsonPath("$.paths['/api/me'].get.responses", not(hasKey("500"))));
+				.andExpect(jsonPath("$.paths['/api/me'].get.responses", not(hasKey("500"))))
+				// The logged-in user comes from the token, so it is not a parameter a client could send
+				.andExpect(jsonPath("$.paths['/api/topics'].get.parameters").doesNotExist());
 	}
 
 	@Test

@@ -2,8 +2,6 @@ package com.openclassrooms.mddapi.controller;
 
 import java.util.List;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.openclassrooms.mddapi.dto.TopicResponse;
+import com.openclassrooms.mddapi.security.CurrentUserId;
 import com.openclassrooms.mddapi.service.TopicService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,22 +33,22 @@ public class TopicController {
 	/**
 	 * Lists every topic, with the subscription state of the logged-in user.
 	 *
-	 * @param jwt the validated token of the current request
+	 * @param userId the id of the logged-in user
 	 * @return all topics
 	 */
 	@GetMapping
 	@Operation(summary = "List every topic", description = "Each topic tells whether the logged-in user follows it.")
 	@ApiResponse(responseCode = "200", description = "All topics")
 	@ApiResponse(responseCode = "401", description = "No valid session")
-	public List<TopicResponse> getTopics(@AuthenticationPrincipal Jwt jwt) {
-		return topicService.getTopics(Long.valueOf(jwt.getSubject()));
+	public List<TopicResponse> getTopics(@CurrentUserId Long userId) {
+		return topicService.getTopics(userId);
 	}
 
 	/**
 	 * Subscribes the logged-in user to a topic. Calling it again for the same topic changes nothing.
 	 *
-	 * @param jwt the validated token of the current request
-	 * @param id  the topic to follow
+	 * @param userId the id of the logged-in user
+	 * @param id     the topic to follow
 	 * @return 204 once subscribed
 	 */
 	@PostMapping("/{id}/subscribe")
@@ -58,16 +57,16 @@ public class TopicController {
 	@ApiResponse(responseCode = "401", description = "No valid session")
 	@ApiResponse(responseCode = "403", description = "Missing or invalid CSRF token")
 	@ApiResponse(responseCode = "404", description = "Unknown topic")
-	public ResponseEntity<Void> subscribe(@AuthenticationPrincipal Jwt jwt, @PathVariable Integer id) {
-		topicService.subscribe(Long.valueOf(jwt.getSubject()), id);
+	public ResponseEntity<Void> subscribe(@CurrentUserId Long userId, @PathVariable Integer id) {
+		topicService.subscribe(userId, id);
 		return ResponseEntity.noContent().build();
 	}
 
 	/**
 	 * Unsubscribes the logged-in user from a topic. Calling it for a topic the user does not follow changes nothing.
 	 *
-	 * @param jwt the validated token of the current request
-	 * @param id  the topic to stop following
+	 * @param userId the id of the logged-in user
+	 * @param id     the topic to stop following
 	 * @return 204 once unsubscribed
 	 */
 	@DeleteMapping("/{id}/subscribe")
@@ -76,8 +75,8 @@ public class TopicController {
 	@ApiResponse(responseCode = "401", description = "No valid session")
 	@ApiResponse(responseCode = "403", description = "Missing or invalid CSRF token")
 	@ApiResponse(responseCode = "404", description = "Unknown topic")
-	public ResponseEntity<Void> unsubscribe(@AuthenticationPrincipal Jwt jwt, @PathVariable Integer id) {
-		topicService.unsubscribe(Long.valueOf(jwt.getSubject()), id);
+	public ResponseEntity<Void> unsubscribe(@CurrentUserId Long userId, @PathVariable Integer id) {
+		topicService.unsubscribe(userId, id);
 		return ResponseEntity.noContent().build();
 	}
 

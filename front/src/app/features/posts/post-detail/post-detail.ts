@@ -5,21 +5,23 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
-import { Observable, catchError, map, of, startWith, switchMap, tap, throwError } from 'rxjs';
+import { Observable, catchError, map, of, startWith, switchMap, tap } from 'rxjs';
 
 import { PostComment, PostDetail as PostDetailModel } from '../../../core/models/post';
 import { PostService } from '../../../core/services/post.service';
 import { Header } from '../../../shared/components/header/header';
+import { LoadError } from '../../../shared/components/load-error/load-error';
 
-/** What the page displays: the article, a "not found" message, or nothing yet while loading. */
-type PageState = { status: 'loading' } | { status: 'loaded'; post: PostDetailModel } | { status: 'not-found' };
+/** What the page displays: the article, a "not found" message, an error with a retry, or nothing yet while loading. */
+type PageState =
+  { status: 'loading' } | { status: 'loaded'; post: PostDetailModel } | { status: 'not-found' } | { status: 'error' };
 
 /**
  * Page of an article: its topic, title, author, date, content and comments, with a form to comment.
  */
 @Component({
   selector: 'app-post-detail',
-  imports: [Header, DatePipe, RouterLink, ReactiveFormsModule],
+  imports: [Header, DatePipe, RouterLink, ReactiveFormsModule, LoadError],
   templateUrl: './post-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -31,8 +33,13 @@ export class PostDetail {
   /** Article id taken from the URL, bound by the router (withComponentInputBinding). */
   readonly id = input.required({ transform: numberAttribute });
 
+  /** Incremented by the retry button, to reload the article after an error. */
+  private readonly attempt = signal(0);
+
   protected readonly state = toSignal(
-    toObservable(this.id).pipe(switchMap((id) => this.load(id))),
+    toObservable(computed(() => ({ id: this.id(), attempt: this.attempt() }))).pipe(
+      switchMap(({ id }) => this.load(id)),
+    ),
     { initialValue: { status: 'loading' } as PageState },
   );
 
@@ -80,6 +87,10 @@ export class PostDetail {
     return content.invalid && content.touched;
   }
 
+  protected retry(): void {
+    this.attempt.update((attempt) => attempt + 1);
+  }
+
   private load(id: number): Observable<PageState> {
     return this.postService.getById(id).pipe(
       tap((post) => {
@@ -89,10 +100,12 @@ export class PostDetail {
       }),
       map((post): PageState => ({ status: 'loaded', post })),
       catchError((error: unknown) =>
-        // A missing article is expected and shown on the page; other errors are reported by the interceptor
-        error instanceof HttpErrorResponse && (error.status === 404 || error.status === 400)
-          ? of<PageState>({ status: 'not-found' })
-          : throwError(() => error),
+        // A missing article is a normal case with its own message; any other error can be retried
+        of<PageState>(
+          error instanceof HttpErrorResponse && (error.status === 404 || error.status === 400)
+            ? { status: 'not-found' }
+            : { status: 'error' },
+        ),
       ),
       startWith<PageState>({ status: 'loading' }),
     );

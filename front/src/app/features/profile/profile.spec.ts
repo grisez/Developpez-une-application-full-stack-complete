@@ -81,6 +81,26 @@ describe('Profile', () => {
     fixture.detectChanges();
   }
 
+  it('should offer to retry when the profile cannot be loaded, then display it', () => {
+    // Arrange
+    profileService.getProfile.and.returnValues(
+      throwError(() => new HttpErrorResponse({ status: 500 })),
+      of(alice),
+    );
+    const fixture = TestBed.createComponent(Profile);
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.querySelector('[role="alert"]')?.textContent).toContain("Le profil n'a pas pu être chargé.");
+
+    // Act
+    element.querySelector<HTMLButtonElement>('[role="alert"] button')!.click();
+    fixture.detectChanges();
+
+    // Assert
+    expect(element.querySelector('[role="alert"]')).toBeNull();
+    expect(input(element, 'username').value).toBe('alice');
+  });
+
   it('should fill the form with the user information, leave the password empty and list the subscriptions', () => {
     // Act
     const { element } = render();

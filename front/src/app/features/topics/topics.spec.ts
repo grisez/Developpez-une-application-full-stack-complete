@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
@@ -66,6 +67,26 @@ describe('Topics', () => {
 
     // Act and assert
     expect(render().querySelector('[role="status"]')?.textContent).toContain('Chargement');
+  });
+
+  it('should offer to retry when the topics cannot be loaded, then display them', () => {
+    // Arrange
+    topicService.getTopics.and.returnValues(
+      throwError(() => new HttpErrorResponse({ status: 500 })),
+      of(topics),
+    );
+    const fixture = TestBed.createComponent(Topics);
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.querySelector('[role="alert"]')?.textContent).toContain("Les thèmes n'ont pas pu être chargés.");
+
+    // Act
+    element.querySelector<HTMLButtonElement>('[role="alert"] button')!.click();
+    fixture.detectChanges();
+
+    // Assert
+    expect(element.querySelector('[role="alert"]')).toBeNull();
+    expect(element.querySelectorAll('li').length).toBe(2);
   });
 
   it('should subscribe to a topic and then show it as already subscribed', () => {

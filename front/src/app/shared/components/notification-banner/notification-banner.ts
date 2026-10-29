@@ -1,4 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationStart, Router } from '@angular/router';
+import { filter } from 'rxjs';
 
 import { NotificationService } from '../../../core/services/notification.service';
 
@@ -12,4 +15,14 @@ import { NotificationService } from '../../../core/services/notification.service
 })
 export class NotificationBanner {
   protected readonly notifications = inject(NotificationService);
+
+  constructor() {
+    // A message describes the page where the error happened: it would be misleading on the next page
+    inject(Router)
+      .events.pipe(
+        filter((event) => event instanceof NavigationStart),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => this.notifications.clear());
+  }
 }

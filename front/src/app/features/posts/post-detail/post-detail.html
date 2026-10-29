@@ -46,7 +46,9 @@
             aria-describedby="comment-error"
           ></textarea>
           @if (showCommentError()) {
-            <p id="comment-error" class="text-sm text-red-700">Veuillez saisir un commentaire (1000 caractères maximum).</p>
+            <p id="comment-error" class="text-sm text-red-700">
+              Veuillez saisir un commentaire (1000 caractères maximum).
+            </p>
           }
           @if (sendError()) {
             <p role="alert" class="text-sm text-red-700">Le commentaire n'a pas pu être envoyé. Veuillez réessayer.</p>
@@ -58,7 +60,14 @@
           aria-label="Envoyer le commentaire"
           class="mb-1 p-2 text-primary hover:text-primary-dark disabled:opacity-60"
         >
-          <svg aria-hidden="true" viewBox="0 0 24 24" class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.5">
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            class="h-8 w-8"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
             <path stroke-linejoin="round" d="M3 11.5 21 3l-6.5 18-3.5-7.5L3 11.5Z" />
             <path stroke-linecap="round" d="M11 13.5 21 3" />
           </svg>
@@ -71,6 +80,8 @@
       <p class="mt-2">Cet article n'existe pas ou n'est plus disponible.</p>
       <a routerLink="/feed" class="mt-4 inline-block text-primary underline">Retour au fil d'actualité</a>
     </section>
+  } @else if (page.status === 'error') {
+    <app-load-error message="L'article n'a pas pu être chargé." (retry)="retry()" />
   } @else {
     <p role="status" class="mt-6 text-center">Chargement de l'article…</p>
   }

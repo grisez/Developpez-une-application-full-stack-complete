@@ -3,9 +3,10 @@
 <main class="mx-auto max-w-5xl px-6 py-6 md:px-10">
   <h1 class="sr-only">Thèmes</h1>
 
-  @if (topics(); as topics) {
+  @let state = topics();
+  @if (state.status === 'loaded') {
     <ul class="grid gap-4 md:grid-cols-2">
-      @for (topic of topics; track topic.id) {
+      @for (topic of state.value; track topic.id) {
         <li class="flex">
           <app-topic-card [topic]="topic" class="w-full">
             @if (topic.subscribed) {
@@ -29,6 +30,8 @@
         <li>Aucun thème pour le moment.</li>
       }
     </ul>
+  } @else if (state.status === 'error') {
+    <app-load-error message="Les thèmes n'ont pas pu être chargés." (retry)="load()" />
   } @else {
     <p role="status">Chargement des thèmes…</p>
   }
