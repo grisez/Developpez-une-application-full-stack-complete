@@ -41,7 +41,7 @@
             placeholder="Écrivez ici votre commentaire"
             rows="3"
             maxlength="1000"
-            class="rounded-md border border-primary px-3 py-2 focus:outline-2 focus:outline-primary"
+            class="rounded-md border border-primary px-3 py-2"
             [attr.aria-invalid]="showCommentError()"
             aria-describedby="comment-error"
           ></textarea>
@@ -66,11 +66,11 @@
       </form>
     </section>
   } @else if (page.status === 'not-found') {
-    <div class="mt-8 text-center">
+    <section class="mt-8 text-center">
       <h1 class="text-xl font-semibold">Article introuvable</h1>
       <p class="mt-2">Cet article n'existe pas ou n'est plus disponible.</p>
       <a routerLink="/feed" class="mt-4 inline-block text-primary underline">Retour au fil d'actualité</a>
-    </div>
+    </section>
   } @else {
     <p role="status" class="mt-6 text-center">Chargement de l'article…</p>
   }

@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import localeFr from '@angular/common/locales/fr';
 import { LOCALE_ID, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Title } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
 
@@ -53,6 +54,14 @@ describe('PostDetail', () => {
     element.querySelector('section form')!.dispatchEvent(new Event('submit'));
     fixture.detectChanges();
   }
+
+  it('should name the browser tab after the article', () => {
+    // Arrange and Act
+    render(of(article));
+
+    // Assert
+    expect(TestBed.inject(Title).getTitle()).toBe('Hello MDD - MDD');
+  });
 
   it('should add the new comment to the list and clear the field', () => {
     // Arrange

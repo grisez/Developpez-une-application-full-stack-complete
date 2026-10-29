@@ -6,6 +6,7 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
+    title: 'Accueil - MDD',
     canActivate: [guestGuard],
     loadComponent: () => import('./features/home/home').then((m) => m.Home),
   },
@@ -54,6 +55,7 @@ export const routes: Routes = [
   },
   {
     path: '**',
+    title: 'Page introuvable - MDD',
     loadComponent: () => import('./features/not-found/not-found').then((m) => m.NotFound),
   },
 ];

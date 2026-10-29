@@ -1,0 +1,10 @@
+<!-- Skip link (RGAA 12.7): hidden until the first Tab, it jumps over the header to the content of the page -->
+<a
+  href="#main"
+  (click)="skipToContent($event)"
+  class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-30 focus:rounded-md focus:bg-white focus:px-4 focus:py-2"
+>
+  Aller au contenu principal
+</a>
+<app-notification-banner />
+<router-outlet />
