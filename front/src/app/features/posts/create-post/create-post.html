@@ -1,0 +1,83 @@
+<app-header />
+
+<main class="mx-auto flex max-w-sm flex-col px-6 py-6 md:max-w-4xl md:px-10">
+  <a routerLink="/feed" aria-label="Retour au fil d'actualité" class="w-fit text-3xl leading-none">&larr;</a>
+
+  <h1 class="mt-4 text-center text-xl font-semibold md:mt-0">Créer un nouvel article</h1>
+
+  @let topicsState = topics();
+  @if (topicsState.status === 'error') {
+    <app-load-error message="Les thèmes n'ont pas pu être chargés." (retry)="retry()" />
+  } @else {
+    <!-- The labels are visually hidden, as on the mockup, but remain announced by screen readers -->
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="mx-auto mt-6 flex w-full max-w-md flex-col gap-4">
+      <div class="flex flex-col gap-1">
+        <label for="topic" class="sr-only">Thème</label>
+        <select
+          id="topic"
+          formControlName="topicId"
+          class="rounded-md border border-primary bg-white px-3 py-2"
+          [attr.aria-invalid]="showError('topicId')"
+          aria-describedby="topic-error"
+        >
+          <option [ngValue]="0" disabled>Sélectionner un thème</option>
+          @if (topicsState.status === 'loaded') {
+            @for (topic of topicsState.value; track topic.id) {
+              <option [ngValue]="topic.id">{{ topic.name }}</option>
+            }
+          }
+        </select>
+        @if (showError('topicId')) {
+          <p id="topic-error" class="text-sm text-red-700">Veuillez choisir un thème.</p>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="title" class="sr-only">Titre de l'article</label>
+        <input
+          id="title"
+          type="text"
+          appTrim
+          formControlName="title"
+          placeholder="Titre de l'article"
+          maxlength="150"
+          class="rounded-md border border-primary px-3 py-2"
+          [attr.aria-invalid]="showError('title')"
+          aria-describedby="title-error"
+        />
+        @if (showError('title')) {
+          <p id="title-error" class="text-sm text-red-700">Veuillez saisir un titre (150 caractères maximum).</p>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="content" class="sr-only">Contenu de l'article</label>
+        <textarea
+          id="content"
+          formControlName="content"
+          placeholder="Contenu de l'article"
+          rows="8"
+          maxlength="10000"
+          class="rounded-md border border-primary px-3 py-2"
+          [attr.aria-invalid]="showError('content')"
+          aria-describedby="content-error"
+        ></textarea>
+        @if (showError('content')) {
+          <p id="content-error" class="text-sm text-red-700">Veuillez saisir le contenu de l'article.</p>
+        }
+      </div>
+
+      @if (serverError(); as message) {
+        <p role="alert" class="text-center text-sm text-red-700">{{ message }}</p>
+      }
+
+      <button
+        type="submit"
+        [disabled]="submitting()"
+        class="mx-auto mt-2 w-32 rounded-md bg-primary py-2 text-sm text-white hover:bg-primary-dark disabled:opacity-60"
+      >
+        Créer
+      </button>
+    </form>
+  }
+</main>

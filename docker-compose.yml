@@ -1,0 +1,49 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: mdd-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mdd-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  back:
+    profiles: ["app"]
+    build: ./back
+    container_name: mdd-back
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "9000:9000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  front:
+    profiles: ["app"]
+    build: ./front
+    container_name: mdd-front
+    restart: unless-stopped
+    ports:
+      - "4200:80"
+    depends_on:
+      - back
+
+volumes:
+  mdd-db-data:

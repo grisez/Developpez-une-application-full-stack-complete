@@ -1,0 +1,19 @@
+@import 'tailwindcss';
+
+/* Colors of the Figma mockups. White text on the primary color has a 4.8:1 contrast ratio (WCAG AA). */
+@theme {
+  --color-primary: #7763c5;
+  --color-primary-dark: #5f4ea6;
+  --color-brand: #7451eb;
+}
+
+/* One visible keyboard focus for every element (RGAA 10.7), offset so that it never merges with a border */
+:focus-visible {
+  outline: 2px solid var(--color-primary-dark);
+  outline-offset: 2px;
+}
+
+/* Placeholders are the visible labels of the profile form: same 4.5:1 minimum contrast as text */
+::placeholder {
+  color: #4b5563;
+}
