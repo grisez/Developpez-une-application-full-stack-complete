@@ -50,6 +50,23 @@ Sur la page de profil, modifiez votre nom d'utilisateur, votre adresse e-mail ou
 **Comment supprimer mon compte ?**
 La suppression se fait sur demande, à l'adresse indiquée dans la [politique de confidentialité](COMPLIANCE.md#retention).
 
+## Données personnelles et sécurité
+
+**Quelles données personnelles sont conservées ?**
+Votre nom d'utilisateur, votre adresse e-mail, vos abonnements, vos articles et vos commentaires. Le mot de passe n'est jamais stocké en clair, seulement son empreinte chiffrée (Argon2id). Aucune autre donnée n'est collectée : ni adresse IP, ni historique de navigation.
+
+**Mes données sont-elles partagées ?**
+Elles ne sont jamais transmises à des tiers. Les autres membres voient vos articles et commentaires avec votre nom d'utilisateur, jamais votre adresse e-mail.
+
+**Quels cookies sont utilisés ?**
+Deux cookies strictement nécessaires : l'un garde votre session ouverte 7 jours et est supprimé à la déconnexion, l'autre protège les formulaires. Aucun cookie publicitaire ni de mesure d'audience.
+
+**Comment protéger mon compte ?**
+Choisissez un mot de passe que vous n'utilisez nulle part ailleurs et ne le communiquez à personne : MDD ne vous le demandera jamais. Sur un ordinateur partagé, déconnectez-vous toujours à la fin.
+
+**Quels sont mes droits sur mes données ?**
+Vous pouvez y accéder, les corriger, les supprimer ou les récupérer. Nom d'utilisateur, e-mail et mot de passe se modifient depuis le profil ; les autres demandes, dont la suppression du compte, se font à l'adresse indiquée dans la [politique de confidentialité](COMPLIANCE.md#rights-of-the-members). Vous pouvez aussi saisir la CNIL.
+
 ## Messages d'erreur courants
 
 | Message | Que faire |
