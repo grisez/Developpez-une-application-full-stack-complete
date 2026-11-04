@@ -30,22 +30,46 @@ describe('auth guards', () => {
   }
 
   it('should let a logged-in user open a protected page', () => {
+    // Arrange
     loggedIn.set(true);
-    expect(run(authGuard)).toBeTrue();
+
+    // Act
+    const result = run(authGuard);
+
+    // Assert
+    expect(result).toBeTrue();
   });
 
   it('should send a visitor from a protected page to the login page', () => {
+    // Arrange
     loggedIn.set(false);
-    expect(redirection(run(authGuard))).toBe('/login');
+
+    // Act
+    const result = run(authGuard);
+
+    // Assert
+    expect(redirection(result)).toBe('/login');
   });
 
   it('should let a visitor open the home, login and registration pages', () => {
+    // Arrange
     loggedIn.set(false);
-    expect(run(guestGuard)).toBeTrue();
+
+    // Act
+    const result = run(guestGuard);
+
+    // Assert
+    expect(result).toBeTrue();
   });
 
   it('should send a logged-in user from those pages straight to the feed', () => {
+    // Arrange
     loggedIn.set(true);
-    expect(redirection(run(guestGuard))).toBe('/feed');
+
+    // Act
+    const result = run(guestGuard);
+
+    // Assert
+    expect(redirection(result)).toBe('/feed');
   });
 });

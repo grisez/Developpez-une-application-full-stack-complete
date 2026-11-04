@@ -16,8 +16,8 @@
         <select
           id="topic"
           formControlName="topicId"
-          class="rounded-md border border-primary bg-white px-3 py-2"
-          [attr.aria-invalid]="showError('topicId')"
+          class="form-input bg-white"
+          [attr.aria-invalid]="showError(form.controls.topicId)"
           aria-describedby="topic-error"
         >
           <option [ngValue]="0" disabled>Sélectionner un thème</option>
@@ -27,8 +27,8 @@
             }
           }
         </select>
-        @if (showError('topicId')) {
-          <p id="topic-error" class="text-sm text-red-700">Veuillez choisir un thème.</p>
+        @if (showError(form.controls.topicId)) {
+          <p id="topic-error" class="error-message">Veuillez choisir un thème.</p>
         }
       </div>
 
@@ -41,12 +41,12 @@
           formControlName="title"
           placeholder="Titre de l'article"
           maxlength="150"
-          class="rounded-md border border-primary px-3 py-2"
-          [attr.aria-invalid]="showError('title')"
+          class="form-input"
+          [attr.aria-invalid]="showError(form.controls.title)"
           aria-describedby="title-error"
         />
-        @if (showError('title')) {
-          <p id="title-error" class="text-sm text-red-700">Veuillez saisir un titre (150 caractères maximum).</p>
+        @if (showError(form.controls.title)) {
+          <p id="title-error" class="error-message">Veuillez saisir un titre (150 caractères maximum).</p>
         }
       </div>
 
@@ -58,26 +58,20 @@
           placeholder="Contenu de l'article"
           rows="8"
           maxlength="10000"
-          class="rounded-md border border-primary px-3 py-2"
-          [attr.aria-invalid]="showError('content')"
+          class="form-input"
+          [attr.aria-invalid]="showError(form.controls.content)"
           aria-describedby="content-error"
         ></textarea>
-        @if (showError('content')) {
-          <p id="content-error" class="text-sm text-red-700">Veuillez saisir le contenu de l'article.</p>
+        @if (showError(form.controls.content)) {
+          <p id="content-error" class="error-message">Veuillez saisir le contenu de l'article.</p>
         }
       </div>
 
       @if (serverError(); as message) {
-        <p role="alert" class="text-center text-sm text-red-700">{{ message }}</p>
+        <p role="alert" class="error-message text-center">{{ message }}</p>
       }
 
-      <button
-        type="submit"
-        [disabled]="submitting()"
-        class="mx-auto mt-2 w-32 rounded-md bg-primary py-2 text-sm text-white hover:bg-primary-dark disabled:opacity-60"
-      >
-        Créer
-      </button>
+      <button type="submit" [disabled]="submitting()" class="btn-primary mx-auto mt-2 w-32 py-2">Créer</button>
     </form>
   }
 </main>

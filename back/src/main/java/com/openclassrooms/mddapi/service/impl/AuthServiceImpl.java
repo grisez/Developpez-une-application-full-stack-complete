@@ -8,9 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.openclassrooms.mddapi.dto.LoginRequest;
 import com.openclassrooms.mddapi.dto.RegisterRequest;
-import com.openclassrooms.mddapi.exception.EmailAlreadyUsedException;
 import com.openclassrooms.mddapi.exception.InvalidCredentialsException;
-import com.openclassrooms.mddapi.exception.UsernameAlreadyUsedException;
 import com.openclassrooms.mddapi.mapper.UserMapper;
 import com.openclassrooms.mddapi.model.User;
 import com.openclassrooms.mddapi.repository.UserRepository;
@@ -41,12 +39,7 @@ public class AuthServiceImpl implements AuthService {
 	public AuthResult register(RegisterRequest request) {
 		String email = EmailAddresses.normalize(request.email());
 		String username = request.username();
-		if (userRepository.existsByEmail(email)) {
-			throw new EmailAlreadyUsedException();
-		}
-		if (userRepository.existsByUsername(username)) {
-			throw new UsernameAlreadyUsedException();
-		}
+		userRepository.checkAvailable(email, username, null);
 
 		User user = new User();
 		user.setEmail(email);

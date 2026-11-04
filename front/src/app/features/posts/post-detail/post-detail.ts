@@ -11,6 +11,7 @@ import { PostComment, PostDetail as PostDetailModel } from '../../../core/models
 import { PostService } from '../../../core/services/post.service';
 import { Header } from '../../../shared/components/header/header';
 import { LoadError } from '../../../shared/components/load-error/load-error';
+import { showError } from '../../../shared/utils/form-errors';
 
 /** What the page displays: the article, a "not found" message, an error with a retry, or nothing yet while loading. */
 type PageState =
@@ -56,6 +57,8 @@ export class PostDetail {
     content: ['', [Validators.required, Validators.maxLength(1000), Validators.pattern(/\S/)]],
   });
 
+  protected readonly showError = showError;
+
   protected readonly sending = signal(false);
 
   protected readonly sendError = signal(false);
@@ -79,12 +82,6 @@ export class PostDetail {
         this.sendError.set(true);
       },
     });
-  }
-
-  /** Whether the comment field should display its error: invalid and already visited by the user. */
-  protected showCommentError(): boolean {
-    const content = this.commentForm.controls.content;
-    return content.invalid && content.touched;
   }
 
   protected retry(): void {

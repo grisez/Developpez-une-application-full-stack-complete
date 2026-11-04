@@ -17,13 +17,13 @@
           formControlName="username"
           placeholder="Nom d'utilisateur"
           autocomplete="username"
-          class="rounded-md border border-primary px-3 py-2"
-          [attr.aria-invalid]="showError('username')"
+          class="form-input"
+          [attr.aria-invalid]="showError(form.controls.username)"
           aria-describedby="username-error"
         />
-        @if (showError('username')) {
-          <p id="username-error" class="text-sm text-red-700">
-            De 3 à 30 caractères : lettres, chiffres, points, tirets et tirets bas uniquement.
+        @if (showError(form.controls.username)) {
+          <p id="username-error" class="error-message">
+            {{ rules.username }}
           </p>
         }
       </div>
@@ -37,12 +37,12 @@
           formControlName="email"
           placeholder="Adresse e-mail"
           autocomplete="email"
-          class="rounded-md border border-primary px-3 py-2"
-          [attr.aria-invalid]="showError('email')"
+          class="form-input"
+          [attr.aria-invalid]="showError(form.controls.email)"
           aria-describedby="email-error"
         />
-        @if (showError('email')) {
-          <p id="email-error" class="text-sm text-red-700">Veuillez saisir une adresse e-mail valide.</p>
+        @if (showError(form.controls.email)) {
+          <p id="email-error" class="error-message">{{ rules.email }}</p>
         }
       </div>
 
@@ -54,13 +54,13 @@
           formControlName="password"
           placeholder="Mot de passe"
           autocomplete="new-password"
-          class="rounded-md border border-primary px-3 py-2"
-          [attr.aria-invalid]="showError('password')"
+          class="form-input"
+          [attr.aria-invalid]="showError(form.controls.password)"
           aria-describedby="password-error"
         />
-        @if (showError('password')) {
-          <p id="password-error" class="text-sm text-red-700">
-            8 caractères minimum, avec au moins un chiffre, une minuscule, une majuscule et un caractère spécial.
+        @if (showError(form.controls.password)) {
+          <p id="password-error" class="error-message">
+            {{ rules.password }}
           </p>
         }
       </div>
@@ -75,13 +75,7 @@
         </p>
       }
 
-      <button
-        type="submit"
-        [disabled]="saving()"
-        class="mx-auto mt-2 w-32 rounded-md bg-primary py-2 text-sm text-white hover:bg-primary-dark disabled:opacity-60"
-      >
-        Sauvegarder
-      </button>
+      <button type="submit" [disabled]="saving()" class="btn-primary mx-auto mt-2 w-32 py-2">Sauvegarder</button>
     </form>
 
     <hr class="my-8 border-gray-300" />
@@ -97,7 +91,7 @@
                 (click)="unsubscribe(topic)"
                 [disabled]="unsubscribing().has(topic.id)"
                 attr.aria-label="Se désabonner du thème {{ topic.name }}"
-                class="mx-auto w-36 rounded-md bg-primary py-2 text-sm text-white hover:bg-primary-dark disabled:opacity-60"
+                class="btn-primary mx-auto w-36 py-2"
               >
                 Se désabonner
               </button>

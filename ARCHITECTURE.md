@@ -36,7 +36,7 @@ flowchart LR
 | Security | JWT (Spring Security OAuth2 Resource Server), Argon2id password hashing |
 | API documentation | springdoc-openapi (Swagger UI) |
 | Tests | JUnit 5, Mockito, Spring Boot Test, Karma and Jasmine, Cypress |
-| Code quality | ESLint with angular-eslint, Prettier, JaCoCo (back-end coverage), SonarQube for IDE (formerly SonarLint) in IntelliJ |
+| Code quality | ESLint with angular-eslint, Prettier, JaCoCo (back-end coverage), PMD and CPD (back-end), SonarQube for IDE (formerly SonarLint) in IntelliJ |
 | Infrastructure | Docker, Docker Compose, nginx |
 | CI and project management | GitHub Actions, GitHub Projects |
 | API testing | Swagger UI, MockMvc and Testcontainers tests |
@@ -152,7 +152,7 @@ ESLint checks the templates with the angular-eslint accessibility rules. The app
 Rules followed by every test:
 
 - The name states the expected behaviour, for example `loginRejectsAWrongPassword` or `should log in and open the feed`.
-- Each test follows the Arrange / Act / Assert structure, marked with comments.
+- Each unit, integration and end-to-end test follows the Arrange / Act / Assert structure, marked with comments. The complete user journey and the screenshot spec are sequences of steps: each step is introduced by a comment instead.
 - Tests are isolated: mocks for unit tests, unique data per integration test, a disposable MySQL container.
 - A bug found by a test is fixed together with the test that reproduces it, so that it cannot come back.
 - The CSRF protection is checked with real token cookies: the `jwt()` helper of spring-security-test disables it on the simulated request.
@@ -167,6 +167,7 @@ The front-end keeps Karma and Jasmine, the test stack generated and supported by
 | Karma coverage | Front-end lines and branches covered by the tests | Same visibility on the front-end |
 | ESLint + angular-eslint | TypeScript rules (no `any`, unused code), Angular conventions (selector prefixes, standalone components) and template accessibility (labels, alternative texts, keyboard events) | One style shared by every file, and accessibility mistakes caught before review |
 | Prettier | Formatting of the TypeScript, HTML templates and CSS of the front-end (indentation, quotes, line length); checked by the CI | No formatting debate in reviews, and diffs that only show real changes |
+| PMD and CPD | Unused code and bad practices in the Java code (`verify` fails on a violation); duplicated blocks | The same rules are checked on every build, and copy-pasted code is spotted before it spreads |
 | SonarQube for IDE (formerly SonarLint) | Code smells, bugs and security hotspots in the Java code, inside the IDE | Problems are fixed while writing the code, before the pull request |
 
 The results of these tools, and what was fixed after them, are listed in [TEST-REPORT.md](TEST-REPORT.md#static-analysis-and-code-review).
@@ -183,5 +184,8 @@ The MVP covers the functional specifications. These improvements would bring it 
 | Performance | The feed returns every article, with its full content | Pagination (`Slice` and infinite scroll) and an excerpt of the content in the list |
 | Compliance | Legal notice and privacy policy are documents of the repository; account deletion is done on request | Pages in the application, linked from a footer; self-service account deletion from the profile |
 | Ergonomics | After logging in from a protected link, the user lands on the feed; comment dates are not displayed | Return to the requested page after login; display the date of each comment |
+| Maintainability | Two patterns load the data of the pages (reactive with signals, and imperative with `load()`); the header is repeated in the template of each page | One reactive pattern for every page; a layout route that holds the header |
+| Maintainability | The front-end limits of the article and comment fields (150, 10 000, 1000) are repeated in the component and its template | Shared constants, bound to `maxlength` and to the messages |
+| Performance | Subscribing to a topic loads the subscriptions of the user (a few topics) | Insert or delete the subscription row directly if the number of topics grows |
 | Quality | End-to-end tests run locally only | Run them in the CI against the Docker Compose stack |
 | Deployment | The application is not deployed | Production stack described in the README (HTTPS, closed ports, backups), to apply on a server |

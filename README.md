@@ -152,7 +152,7 @@ The application is not deployed: this section describes how it would be put into
 
 ### Steps
 
-1. Check out the released version: `git clone` the repository, then `git checkout v1.0.1`.
+1. Check out the released version: `git clone` the repository, then `git checkout v1.0.2`.
 2. Create `.env` from `.env.example` with new, random secrets (`openssl rand -base64 48`), then restrict it to its owner: `chmod 600 .env`.
 3. Back up the database if it already exists (see the production rules below).
 4. Build and start: `docker compose -f docker-compose.prod.yml up -d --build`.
@@ -175,7 +175,7 @@ services:
     # healthcheck: same as in docker-compose.yml
 
   back:
-    image: mdd-back:1.0.1            # Versioned image, so that the previous version can be restarted
+    image: mdd-back:1.0.2            # Versioned image, so that the previous version can be restarted
     build: ./back
     restart: always
     environment:
@@ -190,7 +190,7 @@ services:
         condition: service_healthy
 
   front:
-    image: mdd-front:1.0.1
+    image: mdd-front:1.0.2
     build: ./front
     restart: always
     ports:
@@ -216,7 +216,7 @@ The nginx configuration would also redirect HTTP to HTTPS and listen on 443 with
 | Logs | SQL queries displayed | Warnings and errors, plus the startup messages of the application |
 | Exposed ports | 4200, 9000, 3306 | 80 and 443 only |
 | HTTPS | No | Yes, required by the `Secure` session cookie |
-| Images | Built locally | Versioned tags (`1.0.1`) |
+| Images | Built locally | Versioned tags (`1.0.2`) |
 | Restart policy | `unless-stopped` | `always` |
 
 ### Production rules
@@ -287,6 +287,7 @@ npm run screenshots
 | Tool | Command | Result |
 | --- | --- | --- |
 | JaCoCo (back-end coverage) | `cd back && ./mvnw verify` | Report in `back/target/site/jacoco/index.html`; the build fails below 70% of lines covered |
+| PMD and CPD (back-end) | `cd back && ./mvnw verify`, and `./mvnw pmd:cpd` for the duplicated code | The build fails on a PMD violation; reports in `back/target/pmd.xml` and `back/target/cpd.xml` |
 | Karma coverage (front-end) | `cd front && npm run test:coverage` | Report in `front/coverage/mdd-client/index.html` |
 | ESLint with angular-eslint (front-end) | `cd front && npm run lint` | TypeScript, Angular and template accessibility rules |
 | Prettier (front-end) | `cd front && npm run format` (`format:check` in the CI) | Code formatted the same way in every file |

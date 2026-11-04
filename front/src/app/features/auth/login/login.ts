@@ -6,6 +6,8 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { Header } from '../../../shared/components/header/header';
 import { TrimDirective } from '../../../shared/directives/trim.directive';
+import { showError } from '../../../shared/utils/form-errors';
+import { GENERIC_ERROR_MESSAGE } from '../../../shared/utils/messages';
 
 /**
  * Login form, accepting either the email or the username in a single field.
@@ -25,6 +27,8 @@ export class Login {
     password: ['', Validators.required],
   });
 
+  protected readonly showError = showError;
+
   protected readonly submitting = signal(false);
 
   protected readonly serverError = signal<string | null>(null);
@@ -40,18 +44,8 @@ export class Login {
       next: () => this.router.navigateByUrl('/feed'),
       error: (error: HttpErrorResponse) => {
         this.submitting.set(false);
-        this.serverError.set(
-          error.status === 401
-            ? 'Identifiant ou mot de passe incorrect.'
-            : 'Une erreur est survenue. Veuillez réessayer plus tard.',
-        );
+        this.serverError.set(error.status === 401 ? 'Identifiant ou mot de passe incorrect.' : GENERIC_ERROR_MESSAGE);
       },
     });
-  }
-
-  /** Whether the field should display its error: invalid and already visited by the user. */
-  protected showError(field: 'identifier' | 'password'): boolean {
-    const control = this.form.controls[field];
-    return control.invalid && control.touched;
   }
 }

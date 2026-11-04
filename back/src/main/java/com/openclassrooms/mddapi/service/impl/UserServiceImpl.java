@@ -10,9 +10,6 @@ import com.openclassrooms.mddapi.dto.ProfileResponse;
 import com.openclassrooms.mddapi.dto.TopicResponse;
 import com.openclassrooms.mddapi.dto.UpdateProfileRequest;
 import com.openclassrooms.mddapi.dto.UserResponse;
-import com.openclassrooms.mddapi.exception.EmailAlreadyUsedException;
-import com.openclassrooms.mddapi.exception.UserNotFoundException;
-import com.openclassrooms.mddapi.exception.UsernameAlreadyUsedException;
 import com.openclassrooms.mddapi.mapper.TopicMapper;
 import com.openclassrooms.mddapi.mapper.UserMapper;
 import com.openclassrooms.mddapi.model.User;
@@ -43,26 +40,21 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional(readOnly = true)
 	public UserResponse getById(Long id) {
-		return userMapper.toResponse(findUser(id));
+		return userMapper.toResponse(userRepository.getExisting(id));
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public ProfileResponse getProfile(Long id) {
-		return toProfile(findUser(id));
+		return toProfile(userRepository.getExisting(id));
 	}
 
 	@Override
 	@Transactional
 	public ProfileResponse updateProfile(Long id, UpdateProfileRequest request) {
-		User user = findUser(id);
+		User user = userRepository.getExisting(id);
 		String email = EmailAddresses.normalize(request.email());
-		if (userRepository.existsByEmailAndIdNot(email, id)) {
-			throw new EmailAlreadyUsedException();
-		}
-		if (userRepository.existsByUsernameAndIdNot(request.username(), id)) {
-			throw new UsernameAlreadyUsedException();
-		}
+		userRepository.checkAvailable(email, request.username(), id);
 
 		user.setEmail(email);
 		user.setUsername(request.username());
@@ -77,10 +69,6 @@ public class UserServiceImpl implements UserService {
 				.map(topic -> topicMapper.toResponse(topic, true))
 				.toList();
 		return userMapper.toProfile(user, subscriptions);
-	}
-
-	private User findUser(Long id) {
-		return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
 	}
 
 }

@@ -10,7 +10,7 @@ public abstract class ResourceNotFoundException extends RuntimeException {
 
 	/**
 	 * @param resource the kind of resource, as shown to the client, for example "Article"
-	 * @param id       the id that matched nothing, kept in the message for the server logs only
+	 * @param id       the id that matched nothing, kept in the exception message but never sent to the client
 	 */
 	protected ResourceNotFoundException(String resource, Object id) {
 		super("No " + resource.toLowerCase() + " found with id " + id);

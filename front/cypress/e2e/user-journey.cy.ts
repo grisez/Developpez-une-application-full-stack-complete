@@ -68,22 +68,30 @@ describe('User journey', () => {
   });
 
   it('refuses a wrong password with a generic message', () => {
+    // Arrange
     cy.visit('/login');
     cy.get('#identifier').type('alice');
     cy.get('#password').type('Wrong!Password1');
+
+    // Act
     cy.contains('button', 'Se connecter').click();
 
+    // Assert
     cy.get('[role="alert"]').should('contain', 'Identifiant ou mot de passe incorrect');
     cy.location('pathname').should('eq', '/login');
   });
 
   it('shows the field errors of an invalid registration', () => {
+    // Arrange
     cy.visit('/register');
     cy.get('#username').type('al');
     cy.get('#email').type('not-an-email');
     cy.get('#password').type('weak');
+
+    // Act
     cy.contains('button', "S'inscrire").click();
 
+    // Assert
     cy.get('#username-error').should('be.visible');
     cy.get('#email-error').should('be.visible');
     cy.location('pathname').should('eq', '/register');

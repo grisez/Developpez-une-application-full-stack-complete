@@ -4,7 +4,21 @@
 @theme {
   --color-primary: #7763c5;
   --color-primary-dark: #5f4ea6;
-  --color-brand: #7451eb;
+}
+
+/* Inputs, buttons and error messages look the same on every page: their utility classes are defined once here */
+@layer components {
+  .form-input {
+    @apply rounded-md border border-primary px-3 py-2;
+  }
+
+  .btn-primary {
+    @apply rounded-md bg-primary text-sm text-white hover:bg-primary-dark disabled:opacity-60;
+  }
+
+  .error-message {
+    @apply text-sm text-red-700;
+  }
 }
 
 /* One visible keyboard focus for every element (RGAA 10.7), offset so that it never merges with a border */

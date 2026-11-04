@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.openclassrooms.mddapi.exception.TopicNotFoundException;
 import com.openclassrooms.mddapi.model.Topic;
 
 /**
@@ -32,5 +33,16 @@ public interface TopicRepository extends JpaRepository<Topic, Integer> {
 	 */
 	@Query("select topic from User user join user.subscriptions topic where user.id = :userId order by topic.name")
 	List<Topic> findSubscribedTopics(Long userId);
+
+	/**
+	 * Returns the topic with this id.
+	 *
+	 * @param id the topic id
+	 * @return the topic
+	 * @throws TopicNotFoundException if no topic has this id
+	 */
+	default Topic getExisting(Integer id) {
+		return findById(id).orElseThrow(() -> new TopicNotFoundException(id));
+	}
 
 }
