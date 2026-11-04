@@ -8,29 +8,56 @@ describe('account validators', () => {
     new FormControl(value, Validators.compose(validators)).valid;
 
   it('should accept a username of 3 to 30 letters, digits, dots, hyphens or underscores', () => {
-    expect(isValid('alice.dev_42-x', usernameValidators)).toBeTrue();
-    expect(isValid('al', usernameValidators)).toBeFalse();
-    expect(isValid('a'.repeat(31), usernameValidators)).toBeFalse();
-    expect(isValid('alice@home', usernameValidators)).toBeFalse();
+    // Act
+    const accepted = isValid('alice.dev_42-x', usernameValidators);
+    const rejected = ['al', 'a'.repeat(31), 'alice@home'].map((value) => isValid(value, usernameValidators));
+
+    // Assert
+    expect(accepted).toBeTrue();
+    expect(rejected).toEqual([false, false, false]);
   });
 
   it('should accept a valid email of at most 254 characters', () => {
-    expect(isValid('alice@mdd.dev', emailValidators)).toBeTrue();
-    expect(isValid('not-an-email', emailValidators)).toBeFalse();
-    expect(isValid('', emailValidators)).toBeFalse();
+    // Arrange
+    const domain = (lastLabel: number) =>
+      ['b', 'c'].map((letter) => letter.repeat(63)).join('.') + '.' + 'e'.repeat(lastLabel);
+    const longest = 'a'.repeat(64) + '@' + domain(61);
+
+    // Act
+    const accepted = ['alice@mdd.dev', longest].map((value) => isValid(value, emailValidators));
+    const rejected = ['not-an-email', '', 'a'.repeat(64) + '@' + domain(62)].map((value) =>
+      isValid(value, emailValidators),
+    );
+
+    // Assert
+    expect(accepted).toEqual([true, true]);
+    expect(rejected).toEqual([false, false, false]);
   });
 
   it('should name the field already used when the API answers 409', () => {
-    const conflict = (field: string) =>
-      accountErrorMessage(new HttpErrorResponse({ status: 409, error: { errors: { [field]: 'used' } } }));
+    // Arrange
+    const conflict = (errors: Record<string, string> | null) =>
+      new HttpErrorResponse({ status: 409, error: errors && { errors } });
 
-    expect(conflict('email')).toContain('adresse e-mail');
-    expect(conflict('username')).toContain("nom d'utilisateur");
-    expect(accountErrorMessage(new HttpErrorResponse({ status: 409, error: null }))).toContain('existe déjà');
+    // Act
+    const [email, username, unknown] = [
+      conflict({ email: 'used' }),
+      conflict({ username: 'used' }),
+      conflict(null),
+    ].map(accountErrorMessage);
+
+    // Assert
+    expect(email).toContain('adresse e-mail');
+    expect(username).toContain("nom d'utilisateur");
+    expect(unknown).toContain('existe déjà');
   });
 
   it('should explain invalid fields and server failures', () => {
-    expect(accountErrorMessage(new HttpErrorResponse({ status: 400 }))).toContain('invalides');
-    expect(accountErrorMessage(new HttpErrorResponse({ status: 500 }))).toContain('Une erreur est survenue');
+    // Act
+    const [invalid, failure] = [400, 500].map((status) => accountErrorMessage(new HttpErrorResponse({ status })));
+
+    // Assert
+    expect(invalid).toContain('invalides');
+    expect(failure).toContain('Une erreur est survenue');
   });
 });

@@ -152,7 +152,7 @@ ESLint checks the templates with the angular-eslint accessibility rules. The app
 Rules followed by every test:
 
 - The name states the expected behaviour, for example `loginRejectsAWrongPassword` or `should log in and open the feed`.
-- Each test follows the Arrange / Act / Assert structure, marked with comments.
+- Each unit, integration and end-to-end test follows the Arrange / Act / Assert structure, marked with comments. The complete user journey and the screenshot spec are sequences of steps: each step is introduced by a comment instead.
 - Tests are isolated: mocks for unit tests, unique data per integration test, a disposable MySQL container.
 - A bug found by a test is fixed together with the test that reproduces it, so that it cannot come back.
 - The CSRF protection is checked with real token cookies: the `jwt()` helper of spring-security-test disables it on the simulated request.
