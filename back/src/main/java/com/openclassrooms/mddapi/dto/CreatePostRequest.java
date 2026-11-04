@@ -2,6 +2,8 @@ package com.openclassrooms.mddapi.dto;
 
 import org.springframework.util.StringUtils;
 
+import com.openclassrooms.mddapi.validation.ValidationLimits;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -15,8 +17,8 @@ import jakarta.validation.constraints.Size;
  */
 public record CreatePostRequest(
 		@NotNull Integer topicId,
-		@NotBlank @Size(max = 150) String title,
-		@NotBlank @Size(max = 10_000) String content) {
+		@NotBlank @Size(max = ValidationLimits.POST_TITLE_MAX) String title,
+		@NotBlank @Size(max = ValidationLimits.POST_CONTENT_MAX) String content) {
 
 	/**
 	 * Removes the surrounding spaces of the title before validation runs. The content is kept as typed,
