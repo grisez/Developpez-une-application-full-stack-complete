@@ -42,10 +42,10 @@
             rows="3"
             maxlength="1000"
             class="form-input"
-            [attr.aria-invalid]="showCommentError()"
+            [attr.aria-invalid]="showError(commentForm.controls.content)"
             aria-describedby="comment-error"
           ></textarea>
-          @if (showCommentError()) {
+          @if (showError(commentForm.controls.content)) {
             <p id="comment-error" class="error-message">Veuillez saisir un commentaire (1000 caractères maximum).</p>
           }
           @if (sendError()) {

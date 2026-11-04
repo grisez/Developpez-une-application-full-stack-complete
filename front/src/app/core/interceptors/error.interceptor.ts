@@ -5,6 +5,7 @@ import { catchError, throwError } from 'rxjs';
 
 import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../services/notification.service';
+import { GENERIC_ERROR_MESSAGE } from '../../shared/utils/messages';
 
 /**
  * Requests for which a 401 is an expected answer handled where they are sent: the session check at startup
@@ -31,7 +32,7 @@ export const errorInterceptor: HttpInterceptorFn = (request, next) => {
         } else if (error.status === 0) {
           notifications.show('Le serveur est injoignable. Vérifiez votre connexion puis réessayez.');
         } else if (error.status >= 500) {
-          notifications.show('Une erreur est survenue. Veuillez réessayer plus tard.');
+          notifications.show(GENERIC_ERROR_MESSAGE);
         }
       }
       return throwError(() => error);

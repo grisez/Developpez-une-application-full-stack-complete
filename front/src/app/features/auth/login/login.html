@@ -17,10 +17,10 @@
         formControlName="identifier"
         autocomplete="username"
         class="form-input"
-        [attr.aria-invalid]="showError('identifier')"
+        [attr.aria-invalid]="showError(form.controls.identifier)"
         aria-describedby="identifier-error"
       />
-      @if (showError('identifier')) {
+      @if (showError(form.controls.identifier)) {
         <p id="identifier-error" class="error-message">Veuillez saisir votre e-mail ou votre nom d'utilisateur.</p>
       }
     </div>
@@ -33,10 +33,10 @@
         formControlName="password"
         autocomplete="current-password"
         class="form-input"
-        [attr.aria-invalid]="showError('password')"
+        [attr.aria-invalid]="showError(form.controls.password)"
         aria-describedby="password-error"
       />
-      @if (showError('password')) {
+      @if (showError(form.controls.password)) {
         <p id="password-error" class="error-message">Veuillez saisir votre mot de passe.</p>
       }
     </div>

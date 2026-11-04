@@ -17,12 +17,12 @@
         formControlName="username"
         autocomplete="username"
         class="form-input"
-        [attr.aria-invalid]="showError('username')"
+        [attr.aria-invalid]="showError(form.controls.username)"
         aria-describedby="username-error"
       />
-      @if (showError('username')) {
+      @if (showError(form.controls.username)) {
         <p id="username-error" class="error-message">
-          De 3 à 30 caractères : lettres, chiffres, points, tirets et tirets bas uniquement.
+          {{ rules.username }}
         </p>
       }
     </div>
@@ -36,11 +36,11 @@
         formControlName="email"
         autocomplete="email"
         class="form-input"
-        [attr.aria-invalid]="showError('email')"
+        [attr.aria-invalid]="showError(form.controls.email)"
         aria-describedby="email-error"
       />
-      @if (showError('email')) {
-        <p id="email-error" class="error-message">Veuillez saisir une adresse e-mail valide.</p>
+      @if (showError(form.controls.email)) {
+        <p id="email-error" class="error-message">{{ rules.email }}</p>
       }
     </div>
 
@@ -52,11 +52,11 @@
         formControlName="password"
         autocomplete="new-password"
         class="form-input"
-        [attr.aria-invalid]="showError('password')"
+        [attr.aria-invalid]="showError(form.controls.password)"
         aria-describedby="password-hint"
       />
-      <p id="password-hint" class="text-xs" [class.text-red-700]="showError('password')">
-        8 caractères minimum, avec au moins un chiffre, une minuscule, une majuscule et un caractère spécial.
+      <p id="password-hint" class="text-xs" [class.text-red-700]="showError(form.controls.password)">
+        {{ rules.password }}
       </p>
     </div>
 

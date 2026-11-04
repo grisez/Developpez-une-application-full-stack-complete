@@ -17,7 +17,7 @@
           id="topic"
           formControlName="topicId"
           class="form-input bg-white"
-          [attr.aria-invalid]="showError('topicId')"
+          [attr.aria-invalid]="showError(form.controls.topicId)"
           aria-describedby="topic-error"
         >
           <option [ngValue]="0" disabled>Sélectionner un thème</option>
@@ -27,7 +27,7 @@
             }
           }
         </select>
-        @if (showError('topicId')) {
+        @if (showError(form.controls.topicId)) {
           <p id="topic-error" class="error-message">Veuillez choisir un thème.</p>
         }
       </div>
@@ -42,10 +42,10 @@
           placeholder="Titre de l'article"
           maxlength="150"
           class="form-input"
-          [attr.aria-invalid]="showError('title')"
+          [attr.aria-invalid]="showError(form.controls.title)"
           aria-describedby="title-error"
         />
-        @if (showError('title')) {
+        @if (showError(form.controls.title)) {
           <p id="title-error" class="error-message">Veuillez saisir un titre (150 caractères maximum).</p>
         }
       </div>
@@ -59,10 +59,10 @@
           rows="8"
           maxlength="10000"
           class="form-input"
-          [attr.aria-invalid]="showError('content')"
+          [attr.aria-invalid]="showError(form.controls.content)"
           aria-describedby="content-error"
         ></textarea>
-        @if (showError('content')) {
+        @if (showError(form.controls.content)) {
           <p id="content-error" class="error-message">Veuillez saisir le contenu de l'article.</p>
         }
       </div>
