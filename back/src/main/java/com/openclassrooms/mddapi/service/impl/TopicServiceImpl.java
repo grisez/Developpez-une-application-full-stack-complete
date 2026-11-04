@@ -8,11 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.openclassrooms.mddapi.dto.TopicResponse;
-import com.openclassrooms.mddapi.exception.TopicNotFoundException;
-import com.openclassrooms.mddapi.exception.UserNotFoundException;
 import com.openclassrooms.mddapi.mapper.TopicMapper;
 import com.openclassrooms.mddapi.model.Topic;
-import com.openclassrooms.mddapi.model.User;
 import com.openclassrooms.mddapi.repository.TopicRepository;
 import com.openclassrooms.mddapi.repository.UserRepository;
 import com.openclassrooms.mddapi.service.TopicService;
@@ -44,24 +41,16 @@ public class TopicServiceImpl implements TopicService {
 	@Override
 	@Transactional
 	public void subscribe(Long userId, Integer topicId) {
-		Topic topic = findTopic(topicId);
+		Topic topic = topicRepository.getExisting(topicId);
 		// Subscriptions are a Set backed by a (user_id, topic_id) primary key: a second subscription adds nothing
-		findUser(userId).getSubscriptions().add(topic);
+		userRepository.getExisting(userId).getSubscriptions().add(topic);
 	}
 
 	@Override
 	@Transactional
 	public void unsubscribe(Long userId, Integer topicId) {
-		Topic topic = findTopic(topicId);
-		findUser(userId).getSubscriptions().remove(topic);
-	}
-
-	private Topic findTopic(Integer topicId) {
-		return topicRepository.findById(topicId).orElseThrow(() -> new TopicNotFoundException(topicId));
-	}
-
-	private User findUser(Long userId) {
-		return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+		Topic topic = topicRepository.getExisting(topicId);
+		userRepository.getExisting(userId).getSubscriptions().remove(topic);
 	}
 
 }
