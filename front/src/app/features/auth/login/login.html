@@ -16,14 +16,12 @@
         appTrim
         formControlName="identifier"
         autocomplete="username"
-        class="rounded-md border border-primary px-3 py-2"
+        class="form-input"
         [attr.aria-invalid]="showError('identifier')"
         aria-describedby="identifier-error"
       />
       @if (showError('identifier')) {
-        <p id="identifier-error" class="text-sm text-red-700">
-          Veuillez saisir votre e-mail ou votre nom d'utilisateur.
-        </p>
+        <p id="identifier-error" class="error-message">Veuillez saisir votre e-mail ou votre nom d'utilisateur.</p>
       }
     </div>
 
@@ -34,25 +32,19 @@
         type="password"
         formControlName="password"
         autocomplete="current-password"
-        class="rounded-md border border-primary px-3 py-2"
+        class="form-input"
         [attr.aria-invalid]="showError('password')"
         aria-describedby="password-error"
       />
       @if (showError('password')) {
-        <p id="password-error" class="text-sm text-red-700">Veuillez saisir votre mot de passe.</p>
+        <p id="password-error" class="error-message">Veuillez saisir votre mot de passe.</p>
       }
     </div>
 
     @if (serverError(); as message) {
-      <p role="alert" class="text-center text-sm text-red-700">{{ message }}</p>
+      <p role="alert" class="error-message text-center">{{ message }}</p>
     }
 
-    <button
-      type="submit"
-      [disabled]="submitting()"
-      class="mx-auto mt-2 w-32 rounded-md bg-primary py-2 text-sm text-white hover:bg-primary-dark disabled:opacity-60"
-    >
-      Se connecter
-    </button>
+    <button type="submit" [disabled]="submitting()" class="btn-primary mx-auto mt-2 w-32 py-2">Se connecter</button>
   </form>
 </main>
