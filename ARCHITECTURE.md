@@ -184,5 +184,8 @@ The MVP covers the functional specifications. These improvements would bring it 
 | Performance | The feed returns every article, with its full content | Pagination (`Slice` and infinite scroll) and an excerpt of the content in the list |
 | Compliance | Legal notice and privacy policy are documents of the repository; account deletion is done on request | Pages in the application, linked from a footer; self-service account deletion from the profile |
 | Ergonomics | After logging in from a protected link, the user lands on the feed; comment dates are not displayed | Return to the requested page after login; display the date of each comment |
+| Maintainability | Two patterns load the data of the pages (reactive with signals, and imperative with `load()`); the header is repeated in the template of each page | One reactive pattern for every page; a layout route that holds the header |
+| Maintainability | The front-end limits of the article and comment fields (150, 10 000, 1000) are repeated in the component and its template | Shared constants, bound to `maxlength` and to the messages |
+| Performance | Subscribing to a topic loads the subscriptions of the user (a few topics) | Insert or delete the subscription row directly if the number of topics grows |
 | Quality | End-to-end tests run locally only | Run them in the CI against the Docker Compose stack |
 | Deployment | The application is not deployed | Production stack described in the README (HTTPS, closed ports, backups), to apply on a server |

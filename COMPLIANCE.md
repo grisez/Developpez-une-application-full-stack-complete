@@ -45,6 +45,7 @@ Both cookies are strictly necessary for the service. The application uses no tra
 ## Security of the logs
 
 - No password, token or personal data is written to the logs.
+- nginx keeps no access log, so the IP addresses of the visitors are not recorded. Its error log only names the client when the back-end cannot be reached; it is a technical log of the container, never stored with the members' data.
 - The two messages logged by the back-end are generic: a rejected data conflict, logged without the conflicting value, and an unexpected error.
 - In development, the SQL queries displayed show `?` placeholders, never the values.
 - In production, the libraries only log warnings and errors; the application keeps its own startup messages (`application-prod.properties`).
