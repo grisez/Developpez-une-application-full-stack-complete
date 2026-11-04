@@ -35,7 +35,11 @@ public class CommentServiceImpl implements CommentService {
 	public CommentResponse create(Long postId, Long authorId, CreateCommentRequest request) {
 		Comment comment = new Comment();
 		comment.setContent(request.content());
-		comment.setPost(postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId)));
+		if (!postRepository.existsById(postId)) {
+			throw new PostNotFoundException(postId);
+		}
+		// A reference is enough to set the foreign key: the article and its content are not loaded
+		comment.setPost(postRepository.getReferenceById(postId));
 		comment.setAuthor(userRepository.getExisting(authorId));
 		// saveAndFlush writes the row now, so that the creation date set by Hibernate is in the response
 		return postMapper.toResponse(commentRepository.saveAndFlush(comment));

@@ -57,7 +57,8 @@ class CommentServiceImplTest {
 		post.setId(5L);
 		User bob = new User();
 		bob.setUsername("bob");
-		when(postRepository.findById(5L)).thenReturn(Optional.of(post));
+		when(postRepository.existsById(5L)).thenReturn(true);
+		when(postRepository.getReferenceById(5L)).thenReturn(post);
 		when(userRepository.findById(7L)).thenReturn(Optional.of(bob));
 		when(commentRepository.saveAndFlush(any(Comment.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -75,7 +76,7 @@ class CommentServiceImplTest {
 	@Test
 	void createRejectsAnUnknownArticle() {
 		// Arrange
-		when(postRepository.findById(99L)).thenReturn(Optional.empty());
+		when(postRepository.existsById(99L)).thenReturn(false);
 
 		// Act and assert
 		assertThatThrownBy(() -> commentService.create(99L, 7L, new CreateCommentRequest("Nice post")))
