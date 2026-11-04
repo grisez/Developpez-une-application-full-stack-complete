@@ -2,12 +2,9 @@ package com.openclassrooms.mddapi.dto;
 
 import org.springframework.util.StringUtils;
 
+import com.openclassrooms.mddapi.validation.ValidEmail;
 import com.openclassrooms.mddapi.validation.ValidPassword;
 import com.openclassrooms.mddapi.validation.ValidUsername;
-
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 /**
  * Changes made by a user to their profile, with the same rules as the registration.
@@ -17,7 +14,7 @@ import jakarta.validation.constraints.Size;
  * @param password the new password, or null to keep the current one
  */
 public record UpdateProfileRequest(
-		@NotBlank @Email @Size(max = 254) String email,
+		@ValidEmail String email,
 		@ValidUsername String username,
 		@ValidPassword String password) {
 

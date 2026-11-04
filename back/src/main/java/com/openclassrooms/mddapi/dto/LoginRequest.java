@@ -2,6 +2,8 @@ package com.openclassrooms.mddapi.dto;
 
 import org.springframework.util.StringUtils;
 
+import com.openclassrooms.mddapi.validation.ValidationLimits;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -12,8 +14,8 @@ import jakarta.validation.constraints.Size;
  * @param password   the plain password
  */
 public record LoginRequest(
-		@NotBlank @Size(max = 254) String identifier,
-		@NotBlank @Size(max = 64) String password) {
+		@NotBlank @Size(max = ValidationLimits.EMAIL_MAX) String identifier,
+		@NotBlank @Size(max = ValidationLimits.PASSWORD_MAX) String password) {
 
 	/**
 	 * Removes the surrounding spaces of the identifier before validation runs. The password is kept as typed:

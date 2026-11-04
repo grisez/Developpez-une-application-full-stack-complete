@@ -7,11 +7,13 @@ import { AuthService } from '../../../core/services/auth.service';
 import { Header } from '../../../shared/components/header/header';
 import { TrimDirective } from '../../../shared/directives/trim.directive';
 import {
+  ACCOUNT_RULES,
   accountErrorMessage,
   emailValidators,
   usernameValidators,
 } from '../../../shared/validators/account.validators';
 import { passwordValidator } from '../../../shared/validators/password.validator';
+import { showError } from '../../../shared/utils/form-errors';
 
 /**
  * Registration form. The rules mirror the back-end validation, which remains the reference.
@@ -32,6 +34,10 @@ export class Register {
     password: ['', [Validators.required, passwordValidator]],
   });
 
+  protected readonly showError = showError;
+
+  protected readonly rules = ACCOUNT_RULES;
+
   protected readonly submitting = signal(false);
 
   protected readonly serverError = signal<string | null>(null);
@@ -50,11 +56,5 @@ export class Register {
         this.serverError.set(accountErrorMessage(error));
       },
     });
-  }
-
-  /** Whether the field should display its error: invalid and already visited by the user. */
-  protected showError(field: 'username' | 'email' | 'password'): boolean {
-    const control = this.form.controls[field];
-    return control.invalid && control.touched;
   }
 }

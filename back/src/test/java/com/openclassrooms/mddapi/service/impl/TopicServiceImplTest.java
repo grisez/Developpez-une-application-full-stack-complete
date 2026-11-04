@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
@@ -28,10 +29,12 @@ import com.openclassrooms.mddapi.repository.UserRepository;
 @ExtendWith(MockitoExtension.class)
 class TopicServiceImplTest {
 
-	@Mock
+	// Runs the default lookup methods of the repository on top of the stubbed queries
+	@Mock(answer = Answers.CALLS_REAL_METHODS)
 	private TopicRepository topicRepository;
 
-	@Mock
+	// Runs the default lookup methods of the repository on top of the stubbed queries
+	@Mock(answer = Answers.CALLS_REAL_METHODS)
 	private UserRepository userRepository;
 
 	private TopicServiceImpl topicService;

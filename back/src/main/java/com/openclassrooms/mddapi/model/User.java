@@ -7,6 +7,8 @@ import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.openclassrooms.mddapi.validation.ValidationLimits;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,10 +36,10 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, unique = true, length = 254)
+	@Column(nullable = false, unique = true, length = ValidationLimits.EMAIL_MAX)
 	private String email;
 
-	@Column(nullable = false, unique = true, length = 30)
+	@Column(nullable = false, unique = true, length = ValidationLimits.USERNAME_MAX)
 	private String username;
 
 	/** Argon2id hash of the password, never the plain password. */

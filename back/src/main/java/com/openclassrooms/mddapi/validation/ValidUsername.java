@@ -24,13 +24,13 @@ import jakarta.validation.constraints.Size;
 @Target({ FIELD, PARAMETER })
 @Retention(RUNTIME)
 @NotBlank
-@Size(min = 3, max = 30)
+@Size(min = ValidationLimits.USERNAME_MIN, max = ValidationLimits.USERNAME_MAX)
 @Pattern(regexp = "^[A-Za-z0-9._-]+$")
 @ReportAsSingleViolation
 public @interface ValidUsername {
 
-	String message() default "Username must be 3 to 30 characters long and may only contain letters, digits, dots, "
-			+ "hyphens and underscores.";
+	String message() default "Username must be " + ValidationLimits.USERNAME_MIN + " to " + ValidationLimits.USERNAME_MAX
+			+ " characters long and may only contain letters, digits, dots, hyphens and underscores.";
 
 	Class<?>[] groups() default {};
 

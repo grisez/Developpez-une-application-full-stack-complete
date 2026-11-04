@@ -53,7 +53,7 @@ La suppression se fait sur demande, à l'adresse indiquée dans la [politique de
 ## Données personnelles et sécurité
 
 **Quelles données personnelles sont conservées ?**
-Votre nom d'utilisateur, votre adresse e-mail, vos abonnements, vos articles et vos commentaires. Le mot de passe n'est jamais stocké en clair, seulement son empreinte chiffrée (Argon2id). Aucune autre donnée n'est collectée : ni adresse IP, ni historique de navigation.
+Votre nom d'utilisateur, votre adresse e-mail, vos abonnements, vos articles et vos commentaires. Le mot de passe n'est jamais stocké en clair, seulement son empreinte (hachage Argon2id). Aucune autre donnée n'est collectée : ni adresse IP, ni historique de navigation.
 
 **Mes données sont-elles partagées ?**
 Elles ne sont jamais transmises à des tiers. Les autres membres voient vos articles et commentaires avec votre nom d'utilisateur, jamais votre adresse e-mail.

@@ -24,7 +24,7 @@ import jakarta.validation.constraints.Size;
 @Constraint(validatedBy = {})
 @Target({ FIELD, PARAMETER })
 @Retention(RUNTIME)
-@Size(min = 8, max = 64)
+@Size(min = ValidationLimits.PASSWORD_MIN, max = ValidationLimits.PASSWORD_MAX)
 @Pattern(regexp = ValidPassword.PATTERN)
 @ReportAsSingleViolation
 public @interface ValidPassword {
@@ -32,7 +32,8 @@ public @interface ValidPassword {
 	/** A digit, a lowercase letter, an uppercase letter and a character that is neither a letter nor a digit. */
 	String PATTERN = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).*$";
 
-	String message() default "Password must be 8 to 64 characters long and contain a digit, a lowercase letter, "
+	String message() default "Password must be " + ValidationLimits.PASSWORD_MIN + " to " + ValidationLimits.PASSWORD_MAX
+			+ " characters long and contain a digit, a lowercase letter, "
 			+ "an uppercase letter and a special character.";
 
 	Class<?>[] groups() default {};

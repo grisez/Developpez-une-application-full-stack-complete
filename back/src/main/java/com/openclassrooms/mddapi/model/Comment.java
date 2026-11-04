@@ -4,6 +4,8 @@ import java.time.Instant;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.openclassrooms.mddapi.validation.ValidationLimits;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -31,7 +33,7 @@ public class Comment {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, length = 1000)
+	@Column(nullable = false, length = ValidationLimits.COMMENT_MAX)
 	private String content;
 
 	@CreationTimestamp

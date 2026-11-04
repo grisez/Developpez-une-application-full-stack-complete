@@ -13,9 +13,15 @@ import { Header } from '../../shared/components/header/header';
 import { LoadError } from '../../shared/components/load-error/load-error';
 import { TopicCard } from '../../shared/components/topic-card/topic-card';
 import { TrimDirective } from '../../shared/directives/trim.directive';
-import { accountErrorMessage, emailValidators, usernameValidators } from '../../shared/validators/account.validators';
+import {
+  ACCOUNT_RULES,
+  accountErrorMessage,
+  emailValidators,
+  usernameValidators,
+} from '../../shared/validators/account.validators';
 import { LoadState, toLoadState } from '../../shared/utils/load-state';
 import { passwordValidator } from '../../shared/validators/password.validator';
+import { showError } from '../../shared/utils/form-errors';
 
 /**
  * Profile page of the logged-in user: a form to update their information, then their subscriptions.
@@ -40,6 +46,10 @@ export class Profile {
     email: ['', emailValidators],
     password: ['', passwordValidator],
   });
+
+  protected readonly showError = showError;
+
+  protected readonly rules = ACCOUNT_RULES;
 
   protected readonly saving = signal(false);
 
@@ -101,12 +111,6 @@ export class Profile {
       },
       error: () => this.stopUnsubscribing(topic.id),
     });
-  }
-
-  /** Whether the field should display its error: invalid and already visited by the user. */
-  protected showError(field: 'username' | 'email' | 'password'): boolean {
-    const control = this.form.controls[field];
-    return control.invalid && control.touched;
   }
 
   private stopUnsubscribing(topicId: number): void {

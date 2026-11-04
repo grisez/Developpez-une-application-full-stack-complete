@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -26,11 +27,15 @@ class OpenApiIntegrationTest {
 	@Autowired
 	private MockMvc mockMvc;
 
+	@Autowired
+	private BuildProperties buildProperties;
+
 	@Test
 	void apiDescriptionListsTheEndpointsAndTheCookieAuthentication() throws Exception {
 		// Act and assert
 		mockMvc.perform(get("/v3/api-docs"))
 				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.info.version").value(buildProperties.getVersion()))
 				.andExpect(jsonPath("$.paths", hasKey("/api/auth/login")))
 				.andExpect(jsonPath("$.paths", hasKey("/api/articles/{postId}/comments")))
 				.andExpect(jsonPath("$.components.securitySchemes.cookieAuth.in").value("cookie"))

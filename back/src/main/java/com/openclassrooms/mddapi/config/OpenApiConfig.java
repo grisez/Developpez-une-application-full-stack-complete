@@ -1,5 +1,7 @@
 package com.openclassrooms.mddapi.config;
 
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,10 +25,13 @@ public class OpenApiConfig {
 	/**
 	 * Builds the OpenAPI description. Every endpoint requires the authentication cookie unless it declares otherwise.
 	 *
+	 * @param buildProperties the build information written by Maven, which holds the version of the pom
 	 * @return the OpenAPI description
 	 */
 	@Bean
-	public OpenAPI mddOpenApi() {
+	public OpenAPI mddOpenApi(ObjectProvider<BuildProperties> buildProperties) {
+		// The build information only exists when Maven has built the project, not when it is run from the sources
+		String version = buildProperties.stream().map(BuildProperties::getVersion).findFirst().orElse("dev");
 		SecurityScheme cookieAuth = new SecurityScheme()
 				.type(SecurityScheme.Type.APIKEY)
 				.in(SecurityScheme.In.COOKIE)
@@ -36,7 +41,7 @@ public class OpenApiConfig {
 		return new OpenAPI()
 				.info(new Info()
 						.title("MDD API")
-						.version("1.0.0")
+						.version(version)
 						.description("API of MDD (Monde de Dév), the social network for developers. "
 								+ "Errors follow RFC 9457 (problem details)."))
 				.components(new Components().addSecuritySchemes(COOKIE_AUTH, cookieAuth))

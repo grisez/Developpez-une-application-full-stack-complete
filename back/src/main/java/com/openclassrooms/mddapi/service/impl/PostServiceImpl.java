@@ -10,8 +10,6 @@ import com.openclassrooms.mddapi.dto.CreatePostRequest;
 import com.openclassrooms.mddapi.dto.PostDetailResponse;
 import com.openclassrooms.mddapi.dto.PostResponse;
 import com.openclassrooms.mddapi.exception.PostNotFoundException;
-import com.openclassrooms.mddapi.exception.TopicNotFoundException;
-import com.openclassrooms.mddapi.exception.UserNotFoundException;
 import com.openclassrooms.mddapi.mapper.PostMapper;
 import com.openclassrooms.mddapi.model.Post;
 import com.openclassrooms.mddapi.repository.CommentRepository;
@@ -55,9 +53,8 @@ public class PostServiceImpl implements PostService {
 		Post post = new Post();
 		post.setTitle(request.title());
 		post.setContent(request.content());
-		post.setTopic(topicRepository.findById(request.topicId())
-				.orElseThrow(() -> new TopicNotFoundException(request.topicId())));
-		post.setAuthor(userRepository.findById(authorId).orElseThrow(() -> new UserNotFoundException(authorId)));
+		post.setTopic(topicRepository.getExisting(request.topicId()));
+		post.setAuthor(userRepository.getExisting(authorId));
 		// saveAndFlush writes the row now, so that the creation date set by Hibernate is in the response
 		return postMapper.toResponse(postRepository.saveAndFlush(post));
 	}

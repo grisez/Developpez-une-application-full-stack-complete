@@ -27,8 +27,14 @@ describe('Header', () => {
   const burger = (element: HTMLElement) => element.querySelector<HTMLButtonElement>('[aria-controls="mobile-menu"]')!;
 
   it('should not offer any navigation to a visitor', () => {
+    // Arrange
     loggedIn.set(false);
-    expect(render().element.querySelector('nav')).toBeNull();
+
+    // Act
+    const { element } = render();
+
+    // Assert
+    expect(element.querySelector('nav')).toBeNull();
   });
 
   it('should give a logged-in user access to the articles and the topics', () => {

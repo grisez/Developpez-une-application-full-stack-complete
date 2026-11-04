@@ -11,6 +11,7 @@ import { Header } from '../../../shared/components/header/header';
 import { LoadError } from '../../../shared/components/load-error/load-error';
 import { TrimDirective } from '../../../shared/directives/trim.directive';
 import { LoadState, toLoadState } from '../../../shared/utils/load-state';
+import { showError } from '../../../shared/utils/form-errors';
 
 /**
  * Form to publish an article on a topic. The author and the date are set by the server.
@@ -45,6 +46,8 @@ export class CreatePost {
     content: ['', [Validators.required, Validators.maxLength(10_000), Validators.pattern(/\S/)]],
   });
 
+  protected readonly showError = showError;
+
   protected readonly submitting = signal(false);
 
   protected readonly serverError = signal<string | null>(null);
@@ -67,11 +70,5 @@ export class CreatePost {
 
   protected retry(): void {
     this.attempt.update((attempt) => attempt + 1);
-  }
-
-  /** Whether the field should display its error: invalid and already visited by the user. */
-  protected showError(field: 'topicId' | 'title' | 'content'): boolean {
-    const control = this.form.controls[field];
-    return control.invalid && control.touched;
   }
 }

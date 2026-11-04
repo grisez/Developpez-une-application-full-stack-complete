@@ -41,17 +41,15 @@
             placeholder="Écrivez ici votre commentaire"
             rows="3"
             maxlength="1000"
-            class="rounded-md border border-primary px-3 py-2"
-            [attr.aria-invalid]="showCommentError()"
+            class="form-input"
+            [attr.aria-invalid]="showError(commentForm.controls.content)"
             aria-describedby="comment-error"
           ></textarea>
-          @if (showCommentError()) {
-            <p id="comment-error" class="text-sm text-red-700">
-              Veuillez saisir un commentaire (1000 caractères maximum).
-            </p>
+          @if (showError(commentForm.controls.content)) {
+            <p id="comment-error" class="error-message">Veuillez saisir un commentaire (1000 caractères maximum).</p>
           }
           @if (sendError()) {
-            <p role="alert" class="text-sm text-red-700">Le commentaire n'a pas pu être envoyé. Veuillez réessayer.</p>
+            <p role="alert" class="error-message">Le commentaire n'a pas pu être envoyé. Veuillez réessayer.</p>
           }
         </div>
         <button
