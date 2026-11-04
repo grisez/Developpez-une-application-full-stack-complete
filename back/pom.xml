@@ -21,6 +21,7 @@
 		<!-- The 2.8 line targets Spring Boot 3.5; springdoc 3.x requires Spring Boot 4 -->
 		<springdoc.version>2.8.17</springdoc.version>
 		<jacoco.version>0.8.16</jacoco.version>
+		<pmd-plugin.version>3.26.0</pmd-plugin.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -196,6 +197,23 @@
 								</rule>
 							</rules>
 						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Static analysis: "verify" fails on a PMD violation (default rules: unused code, bad practices);
+			     "./mvnw pmd:cpd" reports the duplicated code in target/cpd.xml -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>${pmd-plugin.version}</version>
+				<configuration>
+					<printFailingErrors>true</printFailingErrors>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>

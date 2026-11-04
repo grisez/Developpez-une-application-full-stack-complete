@@ -287,6 +287,7 @@ npm run screenshots
 | Tool | Command | Result |
 | --- | --- | --- |
 | JaCoCo (back-end coverage) | `cd back && ./mvnw verify` | Report in `back/target/site/jacoco/index.html`; the build fails below 70% of lines covered |
+| PMD and CPD (back-end) | `cd back && ./mvnw verify`, and `./mvnw pmd:cpd` for the duplicated code | The build fails on a PMD violation; reports in `back/target/pmd.xml` and `back/target/cpd.xml` |
 | Karma coverage (front-end) | `cd front && npm run test:coverage` | Report in `front/coverage/mdd-client/index.html` |
 | ESLint with angular-eslint (front-end) | `cd front && npm run lint` | TypeScript, Angular and template accessibility rules |
 | Prettier (front-end) | `cd front && npm run format` (`format:check` in the CI) | Code formatted the same way in every file |

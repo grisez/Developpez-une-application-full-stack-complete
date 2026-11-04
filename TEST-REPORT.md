@@ -59,8 +59,8 @@ Each anomaly was fixed together with a test that reproduces it, so that it canno
 | --- | --- | --- |
 | ESLint with angular-eslint (front-end) | No error | Run by the CI on every pull request |
 | Prettier (front-end formatting) | 13 files reformatted when it was added | `format:check` run by the CI on every pull request |
-| PMD (back-end: unused code, bad practices) | No issue | — |
-| CPD (back-end: duplicated code) | One block: the `content`, `createdAt` and `author` columns shared by `Post` and `Comment` | Kept: two distinct tables, a common parent entity would couple them for three fields |
+| PMD (back-end: unused code, bad practices) | No issue | Run by `./mvnw verify`, so by the CI: the build fails on a violation |
+| CPD (back-end: duplicated code) | No duplicated block above the default threshold (100 tokens) | `./mvnw pmd:cpd`; the `content`, `createdAt` and `author` columns shared by `Post` and `Comment` are kept on purpose: a common parent entity would couple two distinct tables for three fields |
 | Lighthouse accessibility | 98 on the feed, article, topics and profile pages | Before: focus hard to see, pale placeholders, generic page titles, no skip link; all fixed |
 | Full code review before the release | No critical issue; the points below fixed | See below |
 

@@ -36,7 +36,7 @@ flowchart LR
 | Security | JWT (Spring Security OAuth2 Resource Server), Argon2id password hashing |
 | API documentation | springdoc-openapi (Swagger UI) |
 | Tests | JUnit 5, Mockito, Spring Boot Test, Karma and Jasmine, Cypress |
-| Code quality | ESLint with angular-eslint, Prettier, JaCoCo (back-end coverage), SonarQube for IDE (formerly SonarLint) in IntelliJ |
+| Code quality | ESLint with angular-eslint, Prettier, JaCoCo (back-end coverage), PMD and CPD (back-end), SonarQube for IDE (formerly SonarLint) in IntelliJ |
 | Infrastructure | Docker, Docker Compose, nginx |
 | CI and project management | GitHub Actions, GitHub Projects |
 | API testing | Swagger UI, MockMvc and Testcontainers tests |
@@ -167,6 +167,7 @@ The front-end keeps Karma and Jasmine, the test stack generated and supported by
 | Karma coverage | Front-end lines and branches covered by the tests | Same visibility on the front-end |
 | ESLint + angular-eslint | TypeScript rules (no `any`, unused code), Angular conventions (selector prefixes, standalone components) and template accessibility (labels, alternative texts, keyboard events) | One style shared by every file, and accessibility mistakes caught before review |
 | Prettier | Formatting of the TypeScript, HTML templates and CSS of the front-end (indentation, quotes, line length); checked by the CI | No formatting debate in reviews, and diffs that only show real changes |
+| PMD and CPD | Unused code and bad practices in the Java code (`verify` fails on a violation); duplicated blocks | The same rules are checked on every build, and copy-pasted code is spotted before it spreads |
 | SonarQube for IDE (formerly SonarLint) | Code smells, bugs and security hotspots in the Java code, inside the IDE | Problems are fixed while writing the code, before the pull request |
 
 The results of these tools, and what was fixed after them, are listed in [TEST-REPORT.md](TEST-REPORT.md#static-analysis-and-code-review).
